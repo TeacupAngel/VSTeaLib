@@ -3,8 +3,8 @@
         <AssemblyTitle>TeaLib</AssemblyTitle>
         <Authors>TeacupAngel</Authors>
         <Version>1.0.0</Version>
-        <Description>Description of your mod</Description>
-        <RepositoryUrl>https://github.com/You/YourModRepo</RepositoryUrl>
+        <Description>A mod library providing graphical configs and other features</Description>
+        <RepositoryUrl>https://github.com/TeacupAngel/VSTeaLib</RepositoryUrl>
         <TargetFramework>net7.0</TargetFramework>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -14,7 +14,7 @@
         <ModWebsite>https://mods.vintagestory.at/tealib</ModWebsite>
     </PropertyGroup>
     <ItemGroup>
-        <ModInfoAuthors Include='YourVSName'/>
+        <ModInfoAuthors Include='TeacupAngel'/>
     </ItemGroup>
     <ItemGroup>
         <Dependencies Include='game'>
