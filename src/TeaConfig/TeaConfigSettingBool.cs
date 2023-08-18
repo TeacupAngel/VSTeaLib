@@ -1,0 +1,51 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using Vintagestory.API.Client;
+using Vintagestory.API.Common;
+
+namespace TeaLib
+{
+	namespace TeaConfig
+	{
+		public class TeaConfigSettingBool : TeaConfigSetting
+		{
+			private static readonly string[] trueAliases = new string[] {"on", "yes", "true", "1"};
+			private static readonly string[] falseAliases = new string[] {"off", "no", "false", "0"};
+
+			public TeaConfigSettingBool(string code, string category) : base(code, category) {}
+
+			public override string GetStringFromValue(object value) => value.ToString();
+			public override string StringSet(CmdArgs args)
+			{
+				if (!(args.Length > 0)) throw new TeaConfigArgumentException("1 boolean parameter required (Choose 'on' or 'off', or 'yes/no', 'true/false', '1/0')");
+
+				string param = args.PopWord();
+
+				if (string.IsNullOrEmpty(param)) throw new TeaConfigArgumentException("Parameter cannot be empty");
+
+				param = param.ToLower();
+
+				bool boolValue;
+
+				if (trueAliases.Contains(param)) boolValue = true;
+				else if (falseAliases.Contains(param)) boolValue = false;
+				else throw new TeaConfigArgumentException("Parameter is invalid. Choose 'on' or 'off' (or 'yes/no', 'true/false', '1/0')");
+
+				Set(boolValue);
+
+				return Get().ToString();
+			}
+
+			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged)
+			{
+				bool inputValue = value != null ? (bool)value : (bool)Get();
+
+				GuiElementSwitch input = new(capi, (state) => { onChanged(state); }, bounds);
+				input.SetValue(inputValue); // GuiElementSwitch.SetValue doesn't call the eventhandler (unlike other input elements) so this is fine
+
+				return input;
+			}
+		}
+	}
+}

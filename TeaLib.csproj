@@ -1,0 +1,101 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyTitle>TeaLib</AssemblyTitle>
+        <Authors>TeacupAngel</Authors>
+        <Version>1.0.0</Version>
+        <Description>Description of your mod</Description>
+        <RepositoryUrl>https://github.com/You/YourModRepo</RepositoryUrl>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ModId>tealib</ModId>
+        <VSVersion>1.18.8</VSVersion>
+        <ModWebsite>https://mods.vintagestory.at/tealib</ModWebsite>
+    </PropertyGroup>
+    <ItemGroup>
+        <ModInfoAuthors Include='YourVSName'/>
+    </ItemGroup>
+    <ItemGroup>
+        <Dependencies Include='game'>
+            <Version>$(VSVersion)</Version>
+        </Dependencies>
+        <Dependencies Include='survival'>
+            <Version>$(VSVersion)</Version>
+        </Dependencies>
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="VintagestoryAPI">
+            <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VSEssentials">
+            <HintPath>$(VINTAGE_STORY)/Mods/VSEssentials.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VSSurvivalMod">
+            <HintPath>$(VINTAGE_STORY)/Mods/VSSurvivalMod.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="VintagestoryLib">
+            <HintPath>$(VINTAGE_STORY)/VintagestoryLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Cairo">
+            <HintPath>$(VINTAGE_STORY)/Lib/cairo-sharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="protobuf-net" Version="2.1.0">
+            <HintPath>$(VINTAGE_STORY)/Lib/protobuf-net.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+		<Reference Include="Newtonsoft.Json">
+            <HintPath>$(VINTAGE_STORY)/Lib/Newtonsoft.Json.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+    <PropertyGroup>
+        <DebugType>portable</DebugType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>    
+    </PropertyGroup>
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);Launcher/**</DefaultItemExcludes>
+	</PropertyGroup>
+    
+    <Target Name="BaseTarget">
+        <PropertyGroup>
+            <ModInfo>
+{
+    "type": "code",
+    "name": "$(AssemblyTitle)",
+    "modid": "$(ModId)",
+    "version": "$(Version)",
+
+    "description": "$(Description)",
+    "website": "$(ModWebsite)",
+    "authors": [ @(ModInfoAuthors->'"%(Identity)"', ', ') ],
+
+    "dependencies": {
+        @(Dependencies->'"%(Identity)": "%(Version)"', ', ')
+    }
+}
+            </ModInfo>
+        </PropertyGroup>
+
+        <WriteLinesToFile File="$(MSBuildProjectDirectory)/resources/modinfo.json" Lines="$(ModInfo)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+        <Copy SourceFiles="$(MSBuildProjectDirectory)/resources/modinfo.json" DestinationFolder="$(MSBuildProjectDirectory)/resources" SkipUnchangedFiles="true"/>
+
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)/resources/" SkipUnchangedFiles="true"/>
+        <Copy SourceFiles="$(TargetDir)/$(TargetName).pdb" DestinationFolder="$(MSBuildProjectDirectory)/resources" SkipUnchangedFiles="true"/>
+    </Target>
+    <Target Name="DebugTarget" AfterTargets="PostBuildEvent" DependsOnTargets="BaseTarget" Condition="'$(ReleasePack)' == ''"></Target>
+    <Target Name="ReleaseTarget" AfterTargets="PostBuildEvent" DependsOnTargets="BaseTarget" Condition="'$(ReleasePack)' == 1">
+        <MakeDir Directories="$(MSBuildProjectDirectory)/release/$(Version)" />
+        <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)/resources" DestinationFile="$(MSBuildProjectDirectory)/release/$(Version)/$(TargetName)_$(Version)$(ReleasePackName).zip" Overwrite="true" />
+    </Target>
+</Project>
