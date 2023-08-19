@@ -19,9 +19,6 @@ namespace TeaLib
 		public abstract class TeaConfigBase
 		{
 			[JsonIgnore]
-			public abstract string ConfigName {get;}
-
-			[JsonIgnore]
 			public abstract EnumTeaConfigApiSide ConfigType {get;}
 
 			public string Version;
@@ -88,9 +85,18 @@ namespace TeaLib
 				return needsSave;
 			}
 
-			public void Save(ICoreAPI api)
+			public void Save(ICoreAPI api, string configName)
 			{
-				api.StoreModConfig(this, $"{ConfigName}.json");
+				string filename = $"{configName}_{ConfigType.ToString().ToLower()}";
+
+				api.StoreModConfig(this, $"{filename}.json");
+			}
+
+			public T Load<T>(ICoreAPI api, string configName) where T : TeaConfigBase
+			{
+				string filename = $"{configName}_{ConfigType.ToString().ToLower()}";
+
+				return api.LoadModConfig<T>($"{filename}.json");
 			}
 
 			public virtual TeaConfigMigration[] GetMigrations()

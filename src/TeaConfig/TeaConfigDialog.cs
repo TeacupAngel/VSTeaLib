@@ -73,7 +73,7 @@ namespace TeaLib
 			{
 				_modSettingsList = modSettings.OrderBy(modSettings => modSettings.ConfigName).ToList();
 
-				if (_selectedConfigId == null && _modSettingsList.Count > 0) _selectedConfigId = _modSettingsList[0].ConfigID;
+				if (_modSettingsList.Count > 0) TrySetValidConfigId();
 
 				TryOpen();
 			}
@@ -122,28 +122,28 @@ namespace TeaLib
 				ElementBounds modSelectLabelBounds = ElementBounds.Percentual(EnumDialogArea.LeftMiddle, 0.3, 1).WithParentMutual(modSelectBounds);
 				ElementBounds modSelectDropDownBounds = ElementBounds.Percentual(EnumDialogArea.RightMiddle, 0.7, 1).WithParentMutual(modSelectBounds);
 
-				// add inset?
+				// TODO: add inset?
 				ElementBounds optionGroupsBounds = modSelectBounds.BelowCopy(0, 16).WithFixedHeight(32).WithParentMutual(fullBounds);
 				ElementBounds optionsAreaBounds = optionGroupsBounds.BelowCopy().WithFixedHeight(400).WithParentMutual(fullBounds);
 
 				ElementBounds buttonRowBounds = optionsAreaBounds.BelowCopy(0, 16).WithFixedHeight(32).WithParentMutual(fullBounds);
-				// Unfortunately, percentual button width currently crashes the game. Waiting for full switch to .NET 7 to be resolved
+				// TODO: Percentual button width currently crashes the game. Can be patched now that .NET 7 is out
 				//ElementBounds buttonRowSaveBounds = ElementBounds.Percentual(EnumDialogArea.LeftMiddle, 0.2, 1).WithParentMutual(buttonRowBounds);
 				//ElementBounds buttonRowCancelBounds = ElementBounds.Percentual(EnumDialogArea.RightMiddle, 0.2, 1).WithParentMutual(buttonRowBounds);
 				ElementBounds buttonRowCancelBounds = ElementBounds.Fixed(EnumDialogArea.LeftMiddle, 0, 0, 96, 32).WithParentMutual(buttonRowBounds);
 				ElementBounds buttonRowSaveBounds = ElementBounds.Fixed(EnumDialogArea.RightMiddle, 0, 0, 64, 32).WithParentMutual(buttonRowBounds);
 
-				string[] configIDs = _modSettingsList.Select(modSettings => modSettings.ConfigID).ToArray();
-				string[] configNames = _modSettingsList.Select(modSettings => modSettings.ConfigName).ToArray();
+				List<TeaConfigModSettings> availableModSettings = GetAvailableModSettings(_selectedSettingSide).ToList();
+
+				string[] configIDs = availableModSettings.Select(modSettings => modSettings.ConfigID).ToArray();
+				string[] configNames = availableModSettings.Select(modSettings => modSettings.ConfigName).ToArray();
 				
-				List<(EnumTeaConfigDialogSettingSide, string, string)> definedModSettingSides = GetDefinedModSettingSides();
-				(string[] settingSideCodes, string[] settingSideNames) = GetSideCodesAndNames(definedModSettingSides);
+				(string[] settingSideCodes, string[] settingSideNames) = GetSideCodesAndNames();
 
-				// Refactor: EnsureSelectedSideExists needs a better name. I just got seriously confused by where _selectedSettingSide is set, and it caused a bug
-				int selectedSideOption = EnsureSelectedSideExists(definedModSettingSides);
-				int selectedMod = _modSettingsList.FindIndex(mod => mod.ConfigID == _selectedConfigId);
+				int selectedSideOption = (int)_selectedSettingSide;
+				int selectedMod = availableModSettings.FindIndex(mod => mod.ConfigID == _selectedConfigId);
 
-				RefreshOptionTabGroups(_selectedSettingSide);
+				RefreshOptionTabGroups();
 				GuiTab[] optionGroupTabs = GetOptionGroupTabs();
 
 				SingleComposer = capi.Gui.CreateCompo(DialogName, dialogBounds)
@@ -172,33 +172,23 @@ namespace TeaLib
 				SingleComposer.GetScrollableArea("optionsArea").CalcTotalHeight();
 			}
 
-			public List<(EnumTeaConfigDialogSettingSide, string, string)> GetDefinedModSettingSides()
+			public void TrySetValidConfigId()
 			{
-				TeaConfigModSettings modSettings = GetCurrentModSettings();
+				// If a valid config is already set, we don't need to do anything
+				if (GetCurrentModSettings() != null) return;
 
-				List<(EnumTeaConfigDialogSettingSide, string, string)> sideSelectCodes = new();
+				IEnumerable<TeaConfigModSettings> availableModSettings = GetAvailableModSettings(_selectedSettingSide);
+				TeaConfigModSettings firstModSettings = availableModSettings.FirstOrDefault();
 
-				foreach ((EnumTeaConfigDialogSettingSide Type, string Code, string Name) settingSide in _settingSideData)
-				{
-					bool condition = settingSide.Type switch
-					{
-						EnumTeaConfigDialogSettingSide.Client => modSettings.ClientSettings != null,
-						EnumTeaConfigDialogSettingSide.Server => modSettings.ServerSettings != null,
-						_ => throw new ArgumentException("Unknown mod setting side")
-					};
-
-					if (condition) sideSelectCodes.Add(settingSide);
-				}
-
-				return sideSelectCodes;
+				_selectedConfigId = firstModSettings?.ConfigID;
 			}
 
-			public (string[], string[]) GetSideCodesAndNames(List<(EnumTeaConfigDialogSettingSide, string, string)> settingSideData)
+			public (string[], string[]) GetSideCodesAndNames()
 			{
 				List<string> sideSelectCodes = new();
 				List<string> sideSelectNames = new();
 
-				foreach ((EnumTeaConfigDialogSettingSide Type, string Code, string Name) settingSide in settingSideData)
+				foreach ((EnumTeaConfigDialogSettingSide Type, string Code, string Name) settingSide in _settingSideData)
 				{
 					sideSelectCodes.Add(settingSide.Code);
 					sideSelectNames.Add(settingSide.Name);
@@ -207,21 +197,7 @@ namespace TeaLib
 				return (sideSelectCodes.ToArray(), sideSelectNames.ToArray());
 			}
 
-			public int EnsureSelectedSideExists(List<(EnumTeaConfigDialogSettingSide Type, string Code, string Name)> settingSideData)
-			{
-				int selectedSideIndex = settingSideData.Count > 1 ? (int)_selectedSettingSide : 0;
-
-				// If the selected setting side is not present (say, if "server" is picked but mod only has client settings) then try changing it to the side that
-				// does exist 
-				if (settingSideData.Find(data => data.Type == _selectedSettingSide) == default && settingSideData.Count > 0)
-				{ 
-					_selectedSettingSide = settingSideData[0].Type;
-				}
-
-				return selectedSideIndex;
-			}
-
-			private void RefreshOptionTabGroups(EnumTeaConfigDialogSettingSide settingSide)
+			private void RefreshOptionTabGroups()
 			{
 				TeaConfigModSettings modSettings = GetCurrentModSettings();
 
@@ -230,7 +206,7 @@ namespace TeaLib
 					return;
 				}
 
-				ReadOnlyCollection<TeaConfigSetting> settingsArray = settingSide switch
+				ReadOnlyCollection<TeaConfigSetting> settingsArray = _selectedSettingSide switch
 				{
 					EnumTeaConfigDialogSettingSide.Client => modSettings.ClientSettings,
 					EnumTeaConfigDialogSettingSide.Server => modSettings.ServerSettings,
@@ -248,6 +224,19 @@ namespace TeaLib
 					.ToArray();
 			}
 
+			public IEnumerable<TeaConfigModSettings> GetAvailableModSettings(EnumTeaConfigDialogSettingSide settingSide)
+			{
+				IEnumerable<TeaConfigModSettings> availableConfigs = settingSide switch
+				{
+					EnumTeaConfigDialogSettingSide.Client => _modSettingsList.Where(modSettings => modSettings.ClientSettings != null),
+					EnumTeaConfigDialogSettingSide.Server => _modSettingsList.Where(modSettings => modSettings.ServerSettings != null),
+					_ => throw new ArgumentException("Unknown mod setting side")
+				};
+
+				// TODO: Add filtering by mod search input as well
+				return availableConfigs;
+			}
+
 			private GuiTab[] GetOptionGroupTabs()
 			{
 				GuiTab[] optionGroupTabs = _optionCategories.Select((category, index) => new GuiTab
@@ -262,7 +251,7 @@ namespace TeaLib
 
 			private TeaConfigModSettings GetCurrentModSettings()
 			{
-				return _modSettingsList.Where(modSettings => modSettings.ConfigID == _selectedConfigId).FirstOrDefault();
+				return GetAvailableModSettings(_selectedSettingSide).Where(modSettings => modSettings.ConfigID == _selectedConfigId).FirstOrDefault();
 			}
 
 			private (string, List<TeaConfigSetting>) GetCurrentSettingList()
@@ -335,6 +324,9 @@ namespace TeaLib
 
 				_selectedSettingSide = side;
 				_selectedOptionGroupIndex = 0;
+
+				TrySetValidConfigId();
+
 				ComposeDialog();
 			}
 
@@ -353,8 +345,6 @@ namespace TeaLib
 				_selectedOptionGroupIndex = 0;
 
 				ComposeDialog();
-
-				//SingleComposer.GetScrollableArea("optionsArea").RebuildContents(SingleComposer, )
 			}
 
 			private void OnOptionGroupTabChanged(int tab)

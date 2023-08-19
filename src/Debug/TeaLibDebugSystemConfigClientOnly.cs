@@ -24,20 +24,15 @@ namespace TeaLib
 {
 	namespace Debug
 	{
-		public class TeaLibDebugSystemConfig : TeaConfigSystemBase
+		public class TeaLibDebugSystemConfigClientOnly : TeaConfigSystemBase
 		{
 			public override bool ShouldLoad(EnumAppSide forSide) => true;
-			public override string ConfigID => "tealibdbg";
+			public override string ConfigID => "tealibdbgclient";
+			public override string ConfigName => $"{base.ConfigName} (Client-only)";
 
 			public override void LoadConfigs(ICoreAPI api)
 			{
-				ServerConfig = LoadConfig<TeaLibDebugConfigServer>(api);
 				ClientConfig = LoadConfig<TeaLibDebugConfigClient>(api);
-			}
-
-			public TeaLibDebugConfigServer GetServerConfig()
-			{
-				return (TeaLibDebugConfigServer)ServerConfig;
 			}
 
 			public TeaLibDebugConfigClient GetClientConfig()

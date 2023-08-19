@@ -20,7 +20,6 @@ namespace TeaLib
 
 		public class TeaLibDebugConfigClient : TeaConfigBase
 		{
-			public override string ConfigName {get;} = "TeaLibDebugConfigClient";
 			public override EnumTeaConfigApiSide ConfigType {get;} = EnumTeaConfigApiSide.Client;
 
 			// Config data

@@ -99,7 +99,7 @@ namespace TeaLib
 
 				try
 				{
-					T loadedConfig = api.LoadModConfig<T>($"{config.ConfigName}.json");
+					T loadedConfig = config.Load<T>(api, ConfigID);
 
 					if (loadedConfig != null)
 					{
@@ -116,7 +116,7 @@ namespace TeaLib
 				{
 					config.SetVersion(api, Mod.Info.Version, Mod.Info);
 
-					ConfigLoadError($"{Mod.Info.Name}: Failed to load {GetConfigTypeString(config.ConfigType)} config file {config.ConfigName}.json! Default values restored", config, api);
+					ConfigLoadError($"{ConfigName}: Failed to load {GetConfigTypeString(config.ConfigType)} config! Default values restored", config, api);
 				}
 
 				try
@@ -125,12 +125,12 @@ namespace TeaLib
 				}
 				catch
 				{
-					ConfigLoadError($"{Mod.Info.Name}: Failed to migrate {GetConfigTypeString(config.ConfigType)} config file {config.ConfigName}.json to newest version. Could migrate up to {config.Version}", config, api);
+					ConfigLoadError($"{ConfigName}: Failed to migrate {GetConfigTypeString(config.ConfigType)} config to newest version. Could migrate up to {config.Version}", config, api);
 				}
 
 				if (saveConfig)
 				{
-					config.Save(api);
+					config.Save(api, ConfigID);
 				}
 
 				config.CreateConfigSettings();
@@ -178,10 +178,12 @@ namespace TeaLib
 
 			private void CreateNetworkChannels(ICoreAPI api)
 			{
+				string channelName = $"teaconfig_server_{ConfigID}";
+
 				if (ServerNetworkChannel == null && api is ICoreServerAPI serverAPI)
 				{
-					ServerNetworkChannel = serverAPI.Network.GetChannel("teaconfigserver");
-					ServerNetworkChannel ??= serverAPI.Network.RegisterChannel("teaconfigserver")
+					ServerNetworkChannel = serverAPI.Network.GetChannel(channelName);
+					ServerNetworkChannel ??= serverAPI.Network.RegisterChannel(channelName)
 						.RegisterMessageType<TeaConfigServerBroadcastPacket>()
 						.RegisterMessageType<TeaConfigClientServerChangePacket>()
 						.SetMessageHandler<TeaConfigClientServerChangePacket>(OnClientServerChangePacket)
@@ -192,8 +194,8 @@ namespace TeaLib
 
 				if (ClientNetworkChannel == null && api is ICoreClientAPI clientAPI)
 				{
-					ClientNetworkChannel = clientAPI.Network.GetChannel("teaconfigserver");
-					ClientNetworkChannel ??= clientAPI.Network.RegisterChannel("teaconfigserver")
+					ClientNetworkChannel = clientAPI.Network.GetChannel(channelName);
+					ClientNetworkChannel ??= clientAPI.Network.RegisterChannel(channelName)
 						.RegisterMessageType<TeaConfigServerBroadcastPacket>()
 						.SetMessageHandler<TeaConfigServerBroadcastPacket>(OnServerBroadcastPacket)
 						.RegisterMessageType<TeaConfigClientServerChangePacket>()
@@ -204,7 +206,7 @@ namespace TeaLib
 
 			public void SaveConfig(ICoreAPI api, TeaConfigBase config)
 			{
-				config.Save(api);
+				config.Save(api, ConfigID);
 
 				if (config.ConfigType == EnumTeaConfigApiSide.Server) OnServerConfigChanged(api as ICoreServerAPI);
 			}
@@ -217,16 +219,16 @@ namespace TeaLib
 
 				string resultMessage = result.type switch
 				{
-					EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{Mod.Info.Name}: client settings cannot be set on server",
-					EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT => $"{Mod.Info.Name}: setting '{setting.Code}' can't be changed on the client",
-					EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE => $"{Mod.Info.Name}: setting '{setting.Code}' can't be changed",
-					EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE => $"{Mod.Info.Name}: {result.resultInfo}",
-					EnumTeaConfigSetResultType.ERROR_EXCEPTION => $"{Mod.Info.Name}: error setting '{setting.Code}': {result.resultInfo}",
-					EnumTeaConfigSetResultType.ERROR_NO_VALUE => $"{Mod.Info.Name}: no value provided to change the setting to",
-					EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING => $"{Mod.Info.Name}: unknown setting '{settingCode}'",
-					EnumTeaConfigSetResultType.SUCCESS => result.resultInfo != null ? $"{Mod.Info.Name}: set '{setting.Code}' to {result.resultInfo}"
-							: $"{Mod.Info.Name}: setting '{setting.Code}' successfully changed",
-					_ => $"{Mod.Info.Name}: unknown result"
+					EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{ConfigName}: client settings cannot be set on server",
+					EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT => $"{ConfigName}: setting '{setting.Code}' can't be changed on the client",
+					EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE => $"{ConfigName}: setting '{setting.Code}' can't be changed",
+					EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE => $"{ConfigName}: {result.resultInfo}",
+					EnumTeaConfigSetResultType.ERROR_EXCEPTION => $"{ConfigName}: error setting '{setting.Code}': {result.resultInfo}",
+					EnumTeaConfigSetResultType.ERROR_NO_VALUE => $"{ConfigName}: no value provided to change the setting to",
+					EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING => $"{ConfigName}: unknown setting '{settingCode}'",
+					EnumTeaConfigSetResultType.SUCCESS => result.resultInfo != null ? $"{ConfigName}: set '{setting.Code}' to {result.resultInfo}"
+							: $"{ConfigName}: setting '{setting.Code}' successfully changed",
+					_ => $"{ConfigName}: unknown result"
 				};
 
 				if (result.type == EnumTeaConfigSetResultType.SUCCESS)
@@ -316,13 +318,13 @@ namespace TeaLib
 
 				string resultMessage = result.type switch
 				{
-					EnumTeaConfigGetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{Mod.Info.Name}: client settings cannot be read on server",
-					EnumTeaConfigGetResultType.ERROR_GET_NOT_AVAILABLE => $"{Mod.Info.Name}: cannot use get with '{setting.Code}",
-					EnumTeaConfigGetResultType.ERROR_EXCEPTION => $"{Mod.Info.Name}: error reading '{setting.Code}': {result.resultInfo}",
-					EnumTeaConfigGetResultType.ERROR_UNKNOWN_SETTING => $"{Mod.Info.Name}: unknown setting '{settingCode}'",
-					EnumTeaConfigGetResultType.SUCCESS => $"{Mod.Info.Name}: '{setting.Code}' is currently {result.resultInfo}",
-					EnumTeaConfigGetResultType.SUCCESS_NO_VALUE_EXPOSED => $"{Mod.Info.Name}: setting '{setting.Code}' shows no value to be displayed",
-					_ => $"{Mod.Info.Name}: unknown result"
+					EnumTeaConfigGetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{ConfigName}: client settings cannot be read on server",
+					EnumTeaConfigGetResultType.ERROR_GET_NOT_AVAILABLE => $"{ConfigName}: cannot use get with '{setting.Code}",
+					EnumTeaConfigGetResultType.ERROR_EXCEPTION => $"{ConfigName}: error reading '{setting.Code}': {result.resultInfo}",
+					EnumTeaConfigGetResultType.ERROR_UNKNOWN_SETTING => $"{ConfigName}: unknown setting '{settingCode}'",
+					EnumTeaConfigGetResultType.SUCCESS => $"{ConfigName}: '{setting.Code}' is currently {result.resultInfo}",
+					EnumTeaConfigGetResultType.SUCCESS_NO_VALUE_EXPOSED => $"{ConfigName}: setting '{setting.Code}' shows no value to be displayed",
+					_ => $"{ConfigName}: unknown result"
 				};
 
 				return result.type == EnumTeaConfigGetResultType.SUCCESS || result.type == EnumTeaConfigGetResultType.SUCCESS_NO_VALUE_EXPOSED 
@@ -389,7 +391,9 @@ namespace TeaLib
 
 			private void CreateChatCommands(ICoreAPI api)
 			{
-				ReadOnlyCollection<TeaConfigSetting> settingList = api.Side == EnumAppSide.Server ? ServerConfig.ConfigSettings : ClientConfig.ConfigSettings;
+				ReadOnlyCollection<TeaConfigSetting> settingList = api.Side == EnumAppSide.Server ? ServerConfig?.ConfigSettings : ClientConfig?.ConfigSettings;
+				if (settingList == null) return;
+
 				string[] settingSuggestions = settingList.Select(setting => setting.Code).ToArray();
 
 				api.ChatCommands
@@ -433,7 +437,7 @@ namespace TeaLib
 			{
 				sapi = api;
 
-				api.Event.PlayerJoin += OnPlayerJoin;
+				if (ServerConfig != null) api.Event.PlayerJoin += OnPlayerJoin;
 			}
 
 			private void OnPlayerJoin(IServerPlayer player)
@@ -473,7 +477,13 @@ namespace TeaLib
 			}
 
 			private void SendServerConfigToPlayer(IServerPlayer player)
-			{			
+			{
+				if (ServerConfig == null)
+				{
+					sapi.Logger.Warning($"{ConfigName}: Tried to send non-existent server config to player {player.PlayerName}!");
+					return;
+				}
+
 				TeaConfigServerBroadcastPacket packet = new() {
 					ConfigID = ConfigID,
 					Data = JsonConvert.SerializeObject(ServerConfig, new JsonSerializerSettings() {
@@ -487,51 +497,50 @@ namespace TeaLib
 
 			public void OnClientServerChangePacket(IServerPlayer fromPlayer, TeaConfigClientServerChangePacket packet)
 			{
+				if (ConfigID != packet.ConfigID) return;
+
 				EnumTeaConfigChangeResponseState state;
 				Dictionary<string, string> stateData = new();
 
-				// TODO: Check for controlserver privilege
-				// I'm so stupid lol. We can just ignore anything that comes from untrusted users, maybe put it in the logs
 				if (!fromPlayer.HasPrivilege(Privilege.controlserver))
 				{
 					state = EnumTeaConfigChangeResponseState.NoPrivilege;
-					sapi.Logger.Warning($"{Mod.Info.Name}: Player {fromPlayer.PlayerName} tried to change server settings despite not having the privileges to do so!");
+					sapi.Logger.Warning($"{ConfigName}: Player {fromPlayer.PlayerName} tried to change server settings despite not having the privileges to do so!");
+					return;
 				}
-				else
+
+				bool reloadRequired = true;
+				int successCount = 0;
+				int errorCount = 0;
+
+				foreach (KeyValuePair<string, string> settingPair in packet.Data)
 				{
-					bool reloadRequired = true;
-					int successCount = 0;
-					int errorCount = 0;
+					string settingCode = settingPair.Key;
+					string settingValue = settingPair.Value;
 
-					foreach (KeyValuePair<string, string> settingPair in packet.Data)
+					TeaConfigSetResult result = SetSettingValue(sapi, settingCode, new CmdArgs(settingValue), out _);
+
+					switch (result.type)
 					{
-						string settingCode = settingPair.Key;
-						string settingValue = settingPair.Value;
-
-						TeaConfigSetResult result = SetSettingValue(sapi, settingCode, new CmdArgs(settingValue), out _);
-
-						switch (result.type)
-						{
-							case EnumTeaConfigSetResultType.SUCCESS: successCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: sapi.Logger.Error($"{Mod.Info.Name}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: sapi.Logger.Error($"{Mod.Info.Name}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: sapi.Logger.Error($"{Mod.Info.Name}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE: sapi.Logger.Error($"{Mod.Info.Name}: wrong value when changing setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_EXCEPTION: sapi.Logger.Error($"{Mod.Info.Name}: error when setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_NO_VALUE: sapi.Logger.Error($"{Mod.Info.Name}: no value provided to change setting '{settingCode}'"); errorCount++; break;
-							case EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING: sapi.Logger.Error($"{Mod.Info.Name}: attempted to change unknown setting '{settingCode}'"); errorCount++; break;
-							default: sapi.Logger.Error($"{Mod.Info.Name}: unknown error when changing setting '{settingCode}'"); errorCount++; break;
-						}
+						case EnumTeaConfigSetResultType.SUCCESS: successCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: sapi.Logger.Error($"{ConfigName}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: sapi.Logger.Error($"{ConfigName}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: sapi.Logger.Error($"{ConfigName}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE: sapi.Logger.Error($"{ConfigName}: wrong value when changing setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_EXCEPTION: sapi.Logger.Error($"{ConfigName}: error when setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_NO_VALUE: sapi.Logger.Error($"{ConfigName}: no value provided to change setting '{settingCode}'"); errorCount++; break;
+						case EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING: sapi.Logger.Error($"{ConfigName}: attempted to change unknown setting '{settingCode}'"); errorCount++; break;
+						default: sapi.Logger.Error($"{ConfigName}: unknown error when changing setting '{settingCode}'"); errorCount++; break;
 					}
-
-					SaveConfig(sapi, ServerConfig);
-
-					state = EnumTeaConfigChangeResponseState.RequestSuccess;
-
-					stateData["successCount"] = successCount.ToString();
-					stateData["errorCount"] = errorCount.ToString();
-					stateData["reloadRequired"] = reloadRequired ? "1" : "0";
 				}
+
+				SaveConfig(sapi, ServerConfig);
+
+				state = EnumTeaConfigChangeResponseState.RequestSuccess;
+
+				stateData["successCount"] = successCount.ToString();
+				stateData["errorCount"] = errorCount.ToString();
+				stateData["reloadRequired"] = reloadRequired ? "1" : "0";
 
 				TeaConfigServerChangeResponsePacket responsePacket = new() {
 					ConfigID = ConfigID,
@@ -593,14 +602,14 @@ namespace TeaLib
 							switch (result.type)
 							{
 								case EnumTeaConfigSetResultType.SUCCESS: successCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: capi.Logger.Error($"{Mod.Info.Name}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: capi.Logger.Error($"{Mod.Info.Name}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: capi.Logger.Error($"{Mod.Info.Name}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE: capi.Logger.Error($"{Mod.Info.Name}: wrong value when changing setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_EXCEPTION: capi.Logger.Error($"{Mod.Info.Name}: error when setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_NO_VALUE: capi.Logger.Error($"{Mod.Info.Name}: no value provided to change setting '{settingCode}'"); errorCount++; break;
-								case EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING: capi.Logger.Error($"{Mod.Info.Name}: attempted to change unknown setting '{settingCode}'"); errorCount++; break;
-								default: capi.Logger.Error($"{Mod.Info.Name}: unknown error when changing setting '{settingCode}'"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: capi.Logger.Error($"{ConfigName}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: capi.Logger.Error($"{ConfigName}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: capi.Logger.Error($"{ConfigName}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE: capi.Logger.Error($"{ConfigName}: wrong value when changing setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_EXCEPTION: capi.Logger.Error($"{ConfigName}: error when setting '{settingCode}': {result.resultInfo}"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_NO_VALUE: capi.Logger.Error($"{ConfigName}: no value provided to change setting '{settingCode}'"); errorCount++; break;
+								case EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING: capi.Logger.Error($"{ConfigName}: attempted to change unknown setting '{settingCode}'"); errorCount++; break;
+								default: capi.Logger.Error($"{ConfigName}: unknown error when changing setting '{settingCode}'"); errorCount++; break;
 							}
 						}
 

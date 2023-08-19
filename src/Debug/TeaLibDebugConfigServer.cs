@@ -13,7 +13,6 @@ namespace TeaLib
 	{
 		public class TeaLibDebugConfigServer : TeaConfigBase
 		{
-			public override string ConfigName {get;} = "TeaLibDebugConfigServer";
 			public override EnumTeaConfigApiSide ConfigType {get;} = EnumTeaConfigApiSide.Server;
 
 			// Config data		
@@ -27,8 +26,8 @@ namespace TeaLib
 
 				_configSettings = Array.AsReadOnly(new TeaConfigSetting[] 
 				{
-					new TeaConfigSettingFloat("DrifterScariness", "difficulty", 0, 1000),
-					new TeaConfigSettingFloat("RngUnfainess", "difficulty", 0, 1000),
+					new TeaConfigSettingFloat("DrifterScariness", "difficulty"),
+					new TeaConfigSettingFloat("RngUnfainess", "difficulty"),
 					new TeaConfigSettingString("TastiestFood", "opinions"),
 				});
 			}
