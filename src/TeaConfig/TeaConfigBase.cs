@@ -4,6 +4,7 @@ using System.Reflection;
 using Vintagestory.API.Common;
 using ProperVersion;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace TeaLib
 {
@@ -108,7 +109,20 @@ namespace TeaLib
 			protected ReadOnlyCollection<TeaConfigSetting> _configSettings;
 			[JsonIgnore]
 			public ReadOnlyCollection<TeaConfigSetting> ConfigSettings { get => _configSettings; }
-			public virtual void CreateConfigSettings() {} // TODO: Before release, this should be changed to automatically create config settings based on [Attributes]
+			
+			public virtual void CreateConfigSettings() 
+			{
+				List<TeaConfigSetting> tempConfigSettingList = new();
+
+				foreach(PropertyInfo propertyInfo in GetType().GetProperties())
+				{
+					TeaConfigSettingAttribute settingAttribute = propertyInfo.GetCustomAttribute<TeaConfigSettingAttribute>();
+
+					if (settingAttribute != null) tempConfigSettingList.Add(settingAttribute.GetTeaConfigSetting(propertyInfo.Name));
+				}
+
+				_configSettings = tempConfigSettingList.AsReadOnly();
+			}
 
 			public void InitialiseSettings()
 			{

@@ -24,17 +24,19 @@ namespace TeaLib
 
 			// Config data
 			public TeaLibDebugConfigEnum EnumSetting {get; set;} = TeaLibDebugConfigEnum.OptionB;
+
+			[TeaConfigSettingBool("test")]
 			public bool BoolSetting {get; set;} = true;
 
 			public override void CreateConfigSettings()
 			{
 				base.CreateConfigSettings();
 				
-				_configSettings = Array.AsReadOnly(new TeaConfigSetting[] 
+				/*_configSettings = Array.AsReadOnly(new TeaConfigSetting[] 
 				{
 					new TeaConfigSettingEnum<TeaLibDebugConfigEnum>("EnumSetting", "test"),
 					new TeaConfigSettingBool("BoolSetting", "test"),
-				});
+				});*/
 			}
 		}
 	}

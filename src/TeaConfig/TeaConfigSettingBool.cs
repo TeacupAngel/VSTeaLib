@@ -8,6 +8,17 @@ namespace TeaLib
 {
 	namespace TeaConfig
 	{
+		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+		public class TeaConfigSettingBoolAttribute : TeaConfigSettingAttribute 
+		{
+			public TeaConfigSettingBoolAttribute(string category) : base(category) {}
+
+			public override TeaConfigSetting GetTeaConfigSetting(string code)
+			{
+				return new TeaConfigSettingBool(code, _category);
+			}
+		}
+
 		public class TeaConfigSettingBool : TeaConfigSetting
 		{
 			private static readonly string[] trueAliases = new string[] {"on", "yes", "true", "1"};

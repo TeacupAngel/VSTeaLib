@@ -57,10 +57,11 @@ namespace TeaLib
 					(EnumTeaConfigDialogSettingSide.Server, "server", "Server"),
 				};
 
-				_sideSelectTabs = new GuiTab[2]
+				_sideSelectTabs = new GuiTab[1]
 				{
 					new GuiTab { Name = "Global settings", DataInt = (int)EnumTeaConfigDialogSettingType.Global },
-					new GuiTab { Name = "World settings", DataInt = (int)EnumTeaConfigDialogSettingType.World }
+					// Temporarily commented out until world settings can be implemented
+					//new GuiTab { Name = "World settings", DataInt = (int)EnumTeaConfigDialogSettingType.World }
 				};
 			}
 
