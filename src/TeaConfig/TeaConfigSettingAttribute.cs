@@ -10,14 +10,9 @@ namespace TeaLib
 		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 		public abstract class TeaConfigSettingAttribute : Attribute 
 		{
-			protected string _category;
+			public string Category;
 
-			public TeaConfigSettingAttribute(string category)
-			{
-				_category = category;
-			}
-
-			public abstract TeaConfigSetting GetTeaConfigSetting(string code);
+			public abstract TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType);
 		}
 	}
 }

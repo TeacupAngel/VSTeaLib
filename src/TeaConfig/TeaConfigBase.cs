@@ -118,7 +118,7 @@ namespace TeaLib
 				{
 					TeaConfigSettingAttribute settingAttribute = propertyInfo.GetCustomAttribute<TeaConfigSettingAttribute>();
 
-					if (settingAttribute != null) tempConfigSettingList.Add(settingAttribute.GetTeaConfigSetting(propertyInfo.Name));
+					if (settingAttribute != null) tempConfigSettingList.Add(settingAttribute.GetTeaConfigSetting(propertyInfo.Name, propertyInfo.PropertyType));
 				}
 
 				_configSettings = tempConfigSettingList.AsReadOnly();

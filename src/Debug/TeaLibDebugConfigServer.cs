@@ -15,22 +15,13 @@ namespace TeaLib
 		{
 			public override EnumTeaConfigApiSide ConfigType {get;} = EnumTeaConfigApiSide.Server;
 
-			// Config data		
+			// Config data
+			[TeaConfigSettingFloat(Category = "difficulty", Min = 0, Max = 100)]
 			public float DrifterScariness {get; set;} = 0.5f;
+			[TeaConfigSettingFloat(Category = "difficulty", Min = 0, Max = 1000)]
 			public float RngUnfainess {get; set;} = 10f;
+			[TeaConfigSettingString(Category = "opinions", AllowEmpty = false)]
 			public string TastiestFood {get; set;} = "Cheese";
-
-			public override void CreateConfigSettings()
-			{
-				base.CreateConfigSettings();
-
-				_configSettings = Array.AsReadOnly(new TeaConfigSetting[] 
-				{
-					new TeaConfigSettingFloat("DrifterScariness", "difficulty"),
-					new TeaConfigSettingFloat("RngUnfainess", "difficulty"),
-					new TeaConfigSettingString("TastiestFood", "opinions"),
-				});
-			}
 		}
 	}
 }

@@ -9,7 +9,19 @@ using TeaLib.GuiExtensions;
 namespace TeaLib
 {
 	namespace TeaConfig
-	{	
+	{
+		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+		public class TeaConfigSettingEnumAttribute : TeaConfigSettingAttribute 
+		{
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
+			{
+				Type genericEnumType = typeof(TeaConfigSettingEnum<>).MakeGenericType(new Type[] {propertyType});
+				TeaConfigSetting enumSetting = Activator.CreateInstance(genericEnumType, propertyCode, Category) as TeaConfigSetting;
+
+				return enumSetting;
+			}
+		}
+
 		public class TeaConfigSettingEnum<T> : TeaConfigSetting where T : struct, Enum
 		{
 			public TeaConfigSettingEnum(string code, string category) : base(code, category) {}

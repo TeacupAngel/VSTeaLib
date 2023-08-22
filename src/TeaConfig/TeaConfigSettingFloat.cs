@@ -10,7 +10,19 @@ using Cairo;
 namespace TeaLib
 {
 	namespace TeaConfig
-	{	
+	{
+		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+		public class TeaConfigSettingFloatAttribute : TeaConfigSettingAttribute 
+		{
+			public float Min {get; set;} = float.MinValue;
+			public float Max {get; set;} = float.MaxValue;
+
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
+			{
+				return new TeaConfigSettingFloat(propertyCode, Category, Min, Max);
+			}
+		}
+
 		public class TeaConfigSettingFloat : TeaConfigSetting
 		{
 			private readonly float _minValue;
@@ -49,9 +61,13 @@ namespace TeaLib
 				return input;
 			}
 
-			public void SendInput(string textInput, TeaConfigSettingOnChanged onChanged)
+			private void SendInput(string textInput, TeaConfigSettingOnChanged onChanged)
 			{
-				if (float.TryParse(textInput, CultureInfo.InvariantCulture, out float result)) onChanged(result);
+				float result;
+
+				if (!float.TryParse(textInput, CultureInfo.InvariantCulture, out result)) result = (float)Get();
+
+				onChanged(result);
 			}
 		}
 	}

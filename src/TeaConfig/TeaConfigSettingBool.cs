@@ -11,11 +11,9 @@ namespace TeaLib
 		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 		public class TeaConfigSettingBoolAttribute : TeaConfigSettingAttribute 
 		{
-			public TeaConfigSettingBoolAttribute(string category) : base(category) {}
-
-			public override TeaConfigSetting GetTeaConfigSetting(string code)
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
 			{
-				return new TeaConfigSettingBool(code, _category);
+				return new TeaConfigSettingBool(propertyCode, Category);
 			}
 		}
 

@@ -23,21 +23,11 @@ namespace TeaLib
 			public override EnumTeaConfigApiSide ConfigType {get;} = EnumTeaConfigApiSide.Client;
 
 			// Config data
+			[TeaConfigSettingEnum(Category = "test")]
 			public TeaLibDebugConfigEnum EnumSetting {get; set;} = TeaLibDebugConfigEnum.OptionB;
 
-			[TeaConfigSettingBool("test")]
+			[TeaConfigSettingBool(Category = "test")]
 			public bool BoolSetting {get; set;} = true;
-
-			public override void CreateConfigSettings()
-			{
-				base.CreateConfigSettings();
-				
-				/*_configSettings = Array.AsReadOnly(new TeaConfigSetting[] 
-				{
-					new TeaConfigSettingEnum<TeaLibDebugConfigEnum>("EnumSetting", "test"),
-					new TeaConfigSettingBool("BoolSetting", "test"),
-				});*/
-			}
 		}
 	}
 }
