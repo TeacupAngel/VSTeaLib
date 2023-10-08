@@ -26,7 +26,6 @@ namespace TeaLib
 	{
 		public class TeaLibDebugSystemConfigServerOnly : TeaConfigSystemBase
 		{
-			public override bool ShouldLoad(EnumAppSide forSide) => true;
 			public override string ConfigID => "tealibdbgserver";
 			public override string ConfigName => $"{base.ConfigName} (Server-only)";
 

@@ -26,7 +26,6 @@ namespace TeaLib
 	{
 		public class TeaLibDebugSystemConfig : TeaConfigSystemBase
 		{
-			public override bool ShouldLoad(EnumAppSide forSide) => true;
 			public override string ConfigID => "tealibdbg";
 
 			public override void LoadConfigs(ICoreAPI api)

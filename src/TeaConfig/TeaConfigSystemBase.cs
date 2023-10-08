@@ -69,7 +69,7 @@ namespace TeaLib
 			public virtual string ConfigName => Mod.Info.Name;
 
 			public override double ExecuteOrder() => 0.001;
-			public override bool ShouldLoad(EnumAppSide forSide) => false;
+			public override bool ShouldLoad(EnumAppSide forSide) => GetType() != typeof(TeaConfigSystemBase);
 
 			public abstract void LoadConfigs(ICoreAPI api);
 
