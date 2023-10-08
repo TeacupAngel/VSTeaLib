@@ -16,7 +16,7 @@ namespace TeaLib
 
 			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
 			{
-				return new TeaConfigSettingString(propertyCode, Category, AllowEmpty);
+				return new TeaConfigSettingString(propertyCode, Category, AllowEmpty, Flags);
 			}
 		}
 
@@ -24,7 +24,7 @@ namespace TeaLib
 		{
 			private readonly bool _allowEmpty;
 
-			public TeaConfigSettingString(string code, string category, bool allowEmpty = false) : base(code, category) 
+			public TeaConfigSettingString(string code, string category, bool allowEmpty = false, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) 
 			{
 				_allowEmpty = allowEmpty;
 			}

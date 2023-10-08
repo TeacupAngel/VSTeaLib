@@ -13,7 +13,7 @@ namespace TeaLib
 		{
 			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
 			{
-				return new TeaConfigSettingBool(propertyCode, Category);
+				return new TeaConfigSettingBool(propertyCode, Category, Flags);
 			}
 		}
 
@@ -22,7 +22,7 @@ namespace TeaLib
 			private static readonly string[] trueAliases = new string[] {"on", "yes", "true", "1"};
 			private static readonly string[] falseAliases = new string[] {"off", "no", "false", "0"};
 
-			public TeaConfigSettingBool(string code, string category) : base(code, category) {}
+			public TeaConfigSettingBool(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 
 			public override string GetStringFromValue(object value) => value.ToString();
 			public override string StringSet(CmdArgs args)

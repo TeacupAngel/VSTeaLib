@@ -13,13 +13,15 @@ namespace TeaLib
 
 			public string Code {get; protected set;}
 			public string Category {get; protected set;}
+			public TeaConfigSettingFlags Flags {get; protected set;}
 
 			public TeaConfigBase Config {get; set;}
 
-			public TeaConfigSetting(string code, string category)
+			public TeaConfigSetting(string code, string category, TeaConfigSettingFlags flags)
 			{
 				Code = code;
 				Category = category;
+				Flags = flags;
 			}
 
 			public object Get() => Config.GetType().GetProperty(Code).GetValue(Config);

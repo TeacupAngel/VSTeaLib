@@ -10,7 +10,7 @@ namespace TeaLib
 			public delegate string TeaConfigSettingGetDeletage(); 
 			public delegate string TeaConfigSettingSetDeletage(CmdArgs args); 
 
-			public TeaConfigSettingCustom(string code, string category, TeaConfigSettingGetDeletage get, TeaConfigSettingSetDeletage set) : base(code, category)
+			public TeaConfigSettingCustom(string code, string category, TeaConfigSettingGetDeletage get, TeaConfigSettingSetDeletage set, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags)
 			{
 				_get = get;
 				_set = set;

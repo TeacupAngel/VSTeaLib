@@ -13,7 +13,7 @@ namespace TeaLib
 			private readonly int _minValue;
 			private readonly int _maxValue;
 
-			public TeaConfigSettingInt(string code, string category, int minValue = int.MinValue, int maxValue = int.MaxValue) : base(code, category)
+			public TeaConfigSettingInt(string code, string category, int minValue = int.MinValue, int maxValue = int.MaxValue, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags)
 			{
 				_minValue = minValue;
 				_maxValue = maxValue;

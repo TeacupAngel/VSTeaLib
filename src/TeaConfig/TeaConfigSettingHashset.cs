@@ -9,7 +9,7 @@ namespace TeaLib
 	{	
 		public class TeaConfigSettingHashset : TeaConfigSetting
 		{
-			public TeaConfigSettingHashset(string code, string category) : base(code, category) {}
+			public TeaConfigSettingHashset(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 
 			public override string GetStringFromValue(object value) => throw new NotImplementedException();
 			public override string StringSet(CmdArgs args) => throw new NotImplementedException();

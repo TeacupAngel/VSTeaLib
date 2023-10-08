@@ -16,7 +16,7 @@ namespace TeaLib
 			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
 			{
 				Type genericEnumType = typeof(TeaConfigSettingEnum<>).MakeGenericType(new Type[] {propertyType});
-				TeaConfigSetting enumSetting = Activator.CreateInstance(genericEnumType, propertyCode, Category) as TeaConfigSetting;
+				TeaConfigSetting enumSetting = Activator.CreateInstance(genericEnumType, propertyCode, Category, Flags) as TeaConfigSetting;
 
 				return enumSetting;
 			}
@@ -24,7 +24,7 @@ namespace TeaLib
 
 		public class TeaConfigSettingEnum<T> : TeaConfigSetting where T : struct, Enum
 		{
-			public TeaConfigSettingEnum(string code, string category) : base(code, category) {}
+			public TeaConfigSettingEnum(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 			
 			public override string GetStringFromValue(object value) => value.ToString();
 			public override string StringSet(CmdArgs args)

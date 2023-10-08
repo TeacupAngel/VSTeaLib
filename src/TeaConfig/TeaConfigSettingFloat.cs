@@ -19,7 +19,7 @@ namespace TeaLib
 
 			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
 			{
-				return new TeaConfigSettingFloat(propertyCode, Category, Min, Max);
+				return new TeaConfigSettingFloat(propertyCode, Category, Min, Max, Flags);
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace TeaLib
 			private readonly float _minValue;
 			private readonly float _maxValue;
 
-			public TeaConfigSettingFloat(string code, string category, float minValue = float.MinValue, float maxValue = float.MaxValue) : base(code, category)
+			public TeaConfigSettingFloat(string code, string category, float minValue = float.MinValue, float maxValue = float.MaxValue, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags)
 			{
 				_minValue = minValue;
 				_maxValue = maxValue;

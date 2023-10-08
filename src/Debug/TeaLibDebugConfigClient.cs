@@ -28,6 +28,9 @@ namespace TeaLib
 
 			[TeaConfigSettingBool(Category = "test")]
 			public bool BoolSetting {get; set;} = true;
+
+			[TeaConfigSettingFloat(Category = "test", Min = 0, Max = 100, Flags = TeaConfigSettingFlags.RestartNotNeeded)]
+			public float ReloadNotRequired {get; set;} = 0.5f;
 		}
 	}
 }

@@ -509,7 +509,7 @@ namespace TeaLib
 					return;
 				}
 
-				bool reloadRequired = true;
+				bool reloadRequired = false;
 				int successCount = 0;
 				int errorCount = 0;
 
@@ -518,11 +518,11 @@ namespace TeaLib
 					string settingCode = settingPair.Key;
 					string settingValue = settingPair.Value;
 
-					TeaConfigSetResult result = SetSettingValue(sapi, settingCode, new CmdArgs(settingValue), out _);
+					TeaConfigSetResult result = SetSettingValue(sapi, settingCode, new CmdArgs(settingValue), out TeaConfigSetting configSetting);
 
 					switch (result.type)
 					{
-						case EnumTeaConfigSetResultType.SUCCESS: successCount++; break;
+						case EnumTeaConfigSetResultType.SUCCESS: successCount++; reloadRequired |= !configSetting.Flags.HasFlag(TeaConfigSettingFlags.RestartNotNeeded); break;
 						case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: sapi.Logger.Error($"{ConfigName}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
 						case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: sapi.Logger.Error($"{ConfigName}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
 						case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: sapi.Logger.Error($"{ConfigName}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
@@ -590,18 +590,18 @@ namespace TeaLib
 					{
 						int successCount = 0;
 						int errorCount = 0;
-						bool reloadRequired = true;
+						bool reloadRequired = false;
 
 						foreach (KeyValuePair<string, IAttribute> settingPair in clientDataTree)
 						{
 							string settingCode = settingPair.Key;
 							string settingValue = (settingPair.Value as StringAttribute).value;
 
-							TeaConfigSetResult result = SetSettingValue(capi, settingCode, new CmdArgs(settingValue), out _);
+							TeaConfigSetResult result = SetSettingValue(capi, settingCode, new CmdArgs(settingValue), out TeaConfigSetting configSetting);
 
 							switch (result.type)
 							{
-								case EnumTeaConfigSetResultType.SUCCESS: successCount++; break;
+								case EnumTeaConfigSetResultType.SUCCESS: successCount++; reloadRequired |= !configSetting.Flags.HasFlag(TeaConfigSettingFlags.RestartNotNeeded); break;
 								case EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER: capi.Logger.Error($"{ConfigName}: attempted to set client setting '{settingCode}' on server"); errorCount++; break;
 								case EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT: capi.Logger.Error($"{ConfigName}: attempted to set server setting '{settingCode}' on client"); errorCount++; break;
 								case EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE: capi.Logger.Error($"{ConfigName}: attempted to change un-changeable setting '{settingCode}'"); errorCount++; break;
