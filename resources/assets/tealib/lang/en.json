@@ -1,0 +1,33 @@
+{
+	"tealib:client": "Client",
+	"tealib:server": "Server",
+	"tealib:global-settings": "Global settings",
+	"tealib:world-settings": "World settings",
+	"tealib:mod-configuration": "Mod configuration",
+	"tealib:settings-type": "Settings type:",
+	"tealib:search-mod-by-name-label": "Search mod by name:",
+	"tealib:mod-label": "Mod:",
+	"tealib:button-save": "Save",
+	"tealib:button-cancel": "Cancel",
+
+	"tealib:not-implemented": "Not implemented yet, sorry!",
+
+	"tealib:modconfig-category-general": "General",
+	"tealib:modconfig-category-gameplay": "Gameplay",
+	"tealib:modconfig-category-difficulty": "Difficulty",
+	"tealib:modconfig-category-controls": "Controls",
+	"tealib:modconfig-category-graphics": "Graphics",
+	"tealib:modconfig-category-sound": "Sound",
+	"tealib:modconfig-category-other": "Other",
+	
+	"tealibdbg:modconfig-category-opinions": "Opinions",
+	"tealibdbg:modconfig-setting-enumsetting": "Enum Setting",
+	"tealibdbg:modconfig-setting-enumsetting-option-optiona": "Option A",
+	"tealibdbg:modconfig-setting-enumsetting-option-optionb": "Option B",
+	"tealibdbg:modconfig-setting-enumsetting-option-optionc": "Option C",
+	"tealibdbg:modconfig-setting-boolsetting": "Bool Setting",
+	"tealibdbg:modconfig-setting-reloadnotrequired": "Reload Not Required",
+	"tealibdbg:modconfig-setting-drifterscariness": "Drifter Scariness",
+	"tealibdbg:modconfig-setting-rngunfainess": "RNG Unfairness",
+	"tealibdbg:modconfig-setting-tastiestfood": "Tastiest Food"
+}

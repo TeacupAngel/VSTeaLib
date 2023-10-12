@@ -44,7 +44,7 @@ namespace TeaLib
 				return Get().ToString();
 			}
 
-			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged)
+			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged, string settingLangKey)
 			{
 				string stringValue = (string)value;
 				string inputValue = _allowEmpty || !String.IsNullOrEmpty(stringValue) ? stringValue : StringGet();

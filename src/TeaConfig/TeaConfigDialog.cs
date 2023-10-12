@@ -4,13 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Datastructures;
-using ProtoBuf;
-
-using TeaLib.GuiExtensions;
-
-using Cairo;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
+using Vintagestory.API.Config;
+using Cairo;
+
+using TeaLib.GuiExtensions;
 
 namespace TeaLib
 {
@@ -38,7 +37,7 @@ namespace TeaLib
 			private readonly (EnumTeaConfigDialogSettingSide Type, string Code, string Name)[] _settingSideData;
 
 			private readonly GuiTab[] _sideSelectTabs;
-			private string[] _optionCategories = new string[0];
+			private (string code, string name)[] _optionCategories = new (string, string)[0];
 
 			private List<TeaConfigModSettings> _modSettingsList;
 
@@ -53,15 +52,15 @@ namespace TeaLib
 			public TeaConfigDialog(ICoreClientAPI capi) : base(capi) 
 			{
 				_settingSideData = new[] {
-					(EnumTeaConfigDialogSettingSide.Client, "client", "Client"),
-					(EnumTeaConfigDialogSettingSide.Server, "server", "Server"),
+					(EnumTeaConfigDialogSettingSide.Client, "client", Lang.Get("tealib:client")),
+					(EnumTeaConfigDialogSettingSide.Server, "server", Lang.Get("tealib:server")),
 				};
 
 				_sideSelectTabs = new GuiTab[1]
 				{
-					new GuiTab { Name = "Global settings", DataInt = (int)EnumTeaConfigDialogSettingType.Global },
+					new GuiTab { Name = Lang.Get("tealib:global-settings"), DataInt = (int)EnumTeaConfigDialogSettingType.Global },
 					// Temporarily commented out until world settings can be implemented
-					//new GuiTab { Name = "World settings", DataInt = (int)EnumTeaConfigDialogSettingType.World }
+					//new GuiTab { Name = Lang.Get("tealib:world-settings"), DataInt = (int)EnumTeaConfigDialogSettingType.World }
 				};
 			}
 
@@ -149,25 +148,25 @@ namespace TeaLib
 
 				SingleComposer = capi.Gui.CreateCompo(DialogName, dialogBounds)
 					.AddShadedDialogBG(bgBounds, true)
-					.AddDialogTitleBar("Mod configuration", OnTitleBarClose)
+					.AddDialogTitleBar(Lang.Get("tealib:mod-configuration"), OnTitleBarClose)
 					.AddHorizontalTabs(_sideSelectTabs, tabsBounds, (tabNum) => { }, CairoFont.WhiteSmallText(), CairoFont.WhiteSmallText().WithColor(GuiStyle.ActiveButtonTextColor))
-					.AddStaticText("Settings type:", CairoFont.WhiteSmallText(), sideSelectLabelBounds)
+					.AddStaticText(Lang.Get("tealib:settings-type"), CairoFont.WhiteSmallText(), sideSelectLabelBounds)
 					.AddDropDownFixed(settingSideCodes, settingSideNames, selectedSideOption, OnSideSelectChanged, sideSelectDropDownBounds)
 					.AddHorizontalLine(horizontalLineBounds)
-					.AddStaticText("Search mod by name:", CairoFont.WhiteSmallText(), modSearchLabelBounds)
+					.AddStaticText(Lang.Get("tealib:search-mod-by-name-label"), CairoFont.WhiteSmallText(), modSearchLabelBounds)
 					.AddTextInput(modSearchInputBounds, OnModSearchInputChanged, null, "modSearchInput")
-					.AddStaticText("Mod:", CairoFont.WhiteSmallText(), modSelectLabelBounds)
+					.AddStaticText(Lang.Get("tealib:mod-label"), CairoFont.WhiteSmallText(), modSelectLabelBounds)
 					.AddDropDownFixed(configIDs, configNames, selectedMod, OnModSelectChanged, modSelectDropDownBounds)
 					.AddHorizontalTabs(optionGroupTabs, optionGroupsBounds, OnOptionGroupTabChanged, CairoFont.WhiteSmallText(), CairoFont.WhiteSmallText().WithColor(GuiStyle.ActiveButtonTextColor), "optionGroupTabs")
 					.AddScrollableArea(optionsAreaBounds, ComposeModOptions, "optionsArea")
-					.AddButton("Save", SaveAndExit, buttonRowSaveBounds)
-					.AddButton("Cancel", TryClose, buttonRowCancelBounds)
+					.AddButton(Lang.Get("tealib:button-save"), SaveAndExit, buttonRowSaveBounds)
+					.AddButton(Lang.Get("tealib:button-cancel"), TryClose, buttonRowCancelBounds)
 					.Compose()
 				;
 
 				SingleComposer.GetHorizontalTabs("optionGroupTabs").activeElement = _selectedOptionGroupIndex;
 
-				SingleComposer.GetTextInput("modSearchInput").SetPlaceHolderText("Not implemented yet, sorry!");
+				SingleComposer.GetTextInput("modSearchInput").SetPlaceHolderText(Lang.Get("tealib:not-implemented"));
 
 				// Would have been neat to be able to automate this, but alas there's no GuiElement method the GuiComposer would call after finishing composition 
 				SingleComposer.GetScrollableArea("optionsArea").CalcTotalHeight();
@@ -203,7 +202,7 @@ namespace TeaLib
 				TeaConfigModSettings modSettings = GetCurrentModSettings();
 
 				if (modSettings == null) {
-					_optionCategories = new string[0];
+					_optionCategories = new (string, string)[0];
 					return;
 				}
 
@@ -215,14 +214,34 @@ namespace TeaLib
 				};
 
 				if (settingsArray == null) {
-					_optionCategories = new string[0];
+					_optionCategories = new (string, string)[0];
 					return;
 				}
 
 				_optionCategories = settingsArray
 					.GroupBy(setting => setting.Category)
-					.Select(group => group.FirstOrDefault().Category)
+					.Select(group => 
+					{
+						string category = group.FirstOrDefault().Category;
+						string langKey = GetLangKeyWithBackup(modSettings.ConfigID, $"modconfig-category-{category}");
+						return (category, langKey);
+					})
 					.ToArray();
+			}
+
+			// Attempts to return either a translated string from the supplied domain, or a backup from the 'tealib' domain 
+			// Looks at current locale first, then at default locale, and finally just returns the key if nothing is found
+			private string GetLangKeyWithBackup(string domain, string key)
+			{
+				if (Lang.HasTranslation($"{domain}:{key}")) return Lang.Get($"{domain}:{key}");
+				if (Lang.HasTranslation($"tealib:{key}")) return Lang.Get($"tealib:{key}");
+
+				ITranslationService defaultLang = Lang.AvailableLanguages[Lang.DefaultLocale];
+
+				if (defaultLang.HasTranslation($"{domain}:{key}")) return defaultLang.Get($"{domain}:{key}");
+				if (defaultLang.HasTranslation($"tealib:{key}")) return defaultLang.Get($"tealib:{key}");
+
+				return $"{domain}:{key}";
 			}
 
 			public IEnumerable<TeaConfigModSettings> GetAvailableModSettings(EnumTeaConfigDialogSettingSide settingSide)
@@ -242,7 +261,7 @@ namespace TeaLib
 			{
 				GuiTab[] optionGroupTabs = _optionCategories.Select((category, index) => new GuiTab
 				{
-					Name = category,
+					Name = category.name,
 					DataInt = index
 				})
 				.ToArray();
@@ -261,7 +280,7 @@ namespace TeaLib
 
 				if (currentModSettings == null || _optionCategories.Length == 0) return (null, null);
 
-				string currentCategory = _optionCategories[_selectedOptionGroupIndex];
+				string currentCategory = _optionCategories[_selectedOptionGroupIndex].code;
 
 				(string configId, List<TeaConfigSetting> settingList) = _selectedSettingSide switch
 				{
@@ -291,6 +310,8 @@ namespace TeaLib
 
 					ElementBounds inputBounds = ElementBounds.Percentual(EnumDialogArea.RightTop, 0.4, 1).WithParentMutual(currentBounds);
 
+					string settingLangKey = $"{configId}:modconfig-setting-{setting.Code.ToLowerInvariant()}";
+
 					GuiElement settingInput;
 
 					if (!(setting.Config.ConfigType == EnumTeaConfigApiSide.Server && !capi.World.Player.HasPrivilege(Privilege.controlserver)))
@@ -298,7 +319,7 @@ namespace TeaLib
 						settingInput = setting.GetInputElement(capi, inputBounds, inputValue, "Placeholder", (input) =>
 						{
 							changedSettings[changedSettingId] = input;
-						});
+						}, settingLangKey);
 					}
 					else
 					{
@@ -310,7 +331,7 @@ namespace TeaLib
 					container.Add(settingInput);
 
 					ElementBounds labelBounds = ElementBounds.Percentual(EnumDialogArea.LeftTop, 0.6, 1).WithParentMutual(currentBounds);
-					GuiElementStaticText labelText = new(capi, setting.Code, EnumTextOrientation.Left, labelBounds, CairoFont.WhiteSmallText());
+					GuiElementStaticText labelText = new(capi, Lang.Get(settingLangKey), EnumTextOrientation.Left, labelBounds, CairoFont.WhiteSmallText());
 					container.Add(labelText);
 
 					if (lastBounds != null) currentBounds.FixedUnder(lastBounds, 10);

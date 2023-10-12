@@ -23,13 +23,13 @@ namespace TeaLib
 			public override EnumTeaConfigApiSide ConfigType {get;} = EnumTeaConfigApiSide.Client;
 
 			// Config data
-			[TeaConfigSettingEnum(Category = "test")]
+			[TeaConfigSettingEnum(Category = "general")]
 			public TeaLibDebugConfigEnum EnumSetting {get; set;} = TeaLibDebugConfigEnum.OptionB;
 
-			[TeaConfigSettingBool(Category = "test")]
+			[TeaConfigSettingBool(Category = "general")]
 			public bool BoolSetting {get; set;} = true;
 
-			[TeaConfigSettingFloat(Category = "test", Min = 0, Max = 100, Flags = TeaConfigSettingFlags.RestartNotNeeded)]
+			[TeaConfigSettingFloat(Category = "general", Min = 0, Max = 100, Flags = TeaConfigSettingFlags.RestartNotNeeded)]
 			public float ReloadNotRequired {get; set;} = 0.5f;
 		}
 	}

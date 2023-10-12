@@ -1,8 +1,10 @@
 using System;
 using System.Reflection;
+using System.Linq;
 using Cairo;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 
 using TeaLib.GuiExtensions;
 
@@ -42,10 +44,10 @@ namespace TeaLib
 				return Get().ToString();
 			}
 
-			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged)
+			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged, string settingLangKey)
 			{
 				string[] values = Enum.GetNames<T>();
-				string[] names = Enum.GetNames<T>(); // Eventually this should get replaced with `values` run though Lang.Get()
+				string[] names = Enum.GetNames<T>().Select(value => Lang.Get($"{settingLangKey}-option-{value.ToLowerInvariant()}")).ToArray();
 				string selectedValue = value != null ? (string)value : StringGet();
 				int selectedIndex = Array.IndexOf(values, selectedValue);
 

@@ -1,0 +1,22 @@
+{
+	"tealib:client": "Klientské",
+	"tealib:server": "Serverové",
+	"tealib:global-settings": "Celkové nastavení",
+	"tealib:world-settings": "Nastavení pro svět",
+	"tealib:mod-configuration": "Nastavení rozšíření",
+	"tealib:settings-type": "Druh nastavení:",
+	"tealib:search-mod-by-name-label": "Vyhledat podle jména:",
+	"tealib:mod-label": "Rozšíření:",
+	"tealib:button-save": "Uložit",
+	"tealib:button-cancel": "Zrušit",
+
+	"tealib:not-implemented": "Tato funkce ještě není hotová",
+
+	"tealib:modconfig-category-general": "Obecné",
+	"tealib:modconfig-category-gameplay": "Hratelnost",
+	"tealib:modconfig-category-difficulty": "Obtížnost",
+	"tealib:modconfig-category-controls": "Ovládání",
+	"tealib:modconfig-category-graphics": "Grafika",
+	"tealib:modconfig-category-sound": "Zvuk",
+	"tealib:modconfig-category-other": "Ostatní"
+}
