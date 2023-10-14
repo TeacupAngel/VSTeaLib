@@ -50,13 +50,16 @@ namespace TeaLib
 
 				api.ChatCommands
 				.GetOrCreate("tmodconfig")
-				.HandleWith(OpenModDialog);
+				.HandleWith((args) => {
+					OpenModDialog();
+					return TextCommandResult.Success(""); 
+				});
 
 				_capi.Gui.RegisterDialog(new TeaConfigDialog(api));
 				_capi.Event.RegisterEventBusListener(OnConfigSaveComplete, filterByEventName: TeaConfigSystemBase.ON_CONFIG_SAVE_COMPLETE);
 			}
 
-			public TextCommandResult OpenModDialog(TextCommandCallingArgs args)
+			public void OpenModDialog()
 			{
 				List<TeaConfigModSettings> settingsList = new();
 
@@ -66,8 +69,6 @@ namespace TeaLib
 				}
 
 				TeaConfigDialog.GetLoaded(_capi).OpenWithData(settingsList);
-
-				return TextCommandResult.Success("");
 			}
 
 			public void SendSavedSettings(TreeAttribute dataTree)
