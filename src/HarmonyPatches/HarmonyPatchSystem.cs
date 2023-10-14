@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Reflection;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
@@ -19,27 +20,35 @@ namespace TeaLib
 			Common = Server | Client
 		}
 
-		[System.AttributeUsage(System.AttributeTargets.Class)]  
+		[AttributeUsage(AttributeTargets.Class)]  
 		public class VSHarmonyPatchAttribute : System.Attribute  
 		{  
 			public EnumPatchType PatchType {get; private set;}
 	
 			public VSHarmonyPatchAttribute(EnumPatchType patchType)  
 			{  
-				this.PatchType = patchType;
+				PatchType = patchType;
 			}  
 		}  
 
+		// TODO: Decide if this system should automatically patch everything in every loaded mod, or if mod authors should need to extend it (like with the configs)
+		// Or with the new Harmony version, do we even need our own custom attributes? We might be able to patch based on Harmony categories instead
 		public class VSHarmonyPatchSystem : ModSystem
 		{
 			private Harmony harmony;
-			private readonly string harmonyId = "vs.teacupangel.tealib";
+			private string harmonyId = null;
 
-			private List<VSHarmonyPatchBase> patches = new List<VSHarmonyPatchBase>();
+			private readonly List<VSHarmonyPatchBase> patches = new();
 
 			public override void StartPre(ICoreAPI api)
 			{
-				// TODO: create harmonyId namespace dynamically from assembly name and author?
+				if (harmonyId == null)
+				{
+					StringBuilder stringBuilder = new StringBuilder("vs");
+					if (Mod.Info.Authors.Count > 0) stringBuilder.AppendFormat(".{0}", Mod.Info.Authors[0].ToLowerInvariant());
+					stringBuilder.AppendFormat(".{0}", Mod.Info.ModID.ToLowerInvariant());
+					harmonyId = stringBuilder.ToString();
+				}
 
 				harmony = new Harmony(harmonyId);
 			}
