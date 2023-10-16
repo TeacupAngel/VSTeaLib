@@ -453,29 +453,6 @@ namespace TeaLib
 				}
 			}
 
-			public class TeaConfigSerializationBinder : SerializationBinder
-			{
-				public TeaConfigSerializationBinder() {}
-
-				public override Type BindToType(string assemblyName, string typeName)
-				{
-					Type returnType = Assembly.GetExecutingAssembly().GetType(typeName);
-
-					if (!typeof(TeaConfigBase).IsAssignableFrom(returnType))
-					{
-						throw new Exception("Tried to pass unallowed class as config");
-					}
-
-					return returnType;
-				}
-
-				public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
-				{
-					assemblyName = "#dll"; // The things we have to do because the Newtonsoft.Json version used is 7 years old :/
-					typeName = serializedType.FullName;
-				}
-			}
-
 			private void SendServerConfigToPlayer(IServerPlayer player)
 			{
 				if (ServerConfig == null)
@@ -486,10 +463,7 @@ namespace TeaLib
 
 				TeaConfigServerBroadcastPacket packet = new() {
 					ConfigID = ConfigID,
-					Data = JsonConvert.SerializeObject(ServerConfig, new JsonSerializerSettings() {
-						TypeNameHandling = TypeNameHandling.All,
-						Binder = new TeaConfigSerializationBinder()
-					})
+					Data = JsonConvert.SerializeObject(ServerConfig)
 				};
 
 				ServerNetworkChannel.SendPacket(packet, player);
@@ -677,35 +651,15 @@ namespace TeaLib
 			private void OnServerBroadcastPacket(TeaConfigServerBroadcastPacket packet)
 			{
 				if (packet.ConfigID != ConfigID) return;
-				
-				TeaConfigBase incomingConfig;
 
 				try
 				{
-					incomingConfig = JsonConvert.DeserializeObject<TeaConfigBase>(packet.Data.Replace("#dll", Assembly.GetExecutingAssembly().GetName().FullName), new JsonSerializerSettings() 
-					{
-						TypeNameHandling = TypeNameHandling.All,
-						Binder = new TeaConfigSerializationBinder()
-					});
+					JsonConvert.PopulateObject(packet.Data, ServerConfig);
 				}
-				catch (Exception)
+				catch (Exception exception)
 				{
-					capi.ShowChatMessage($"Failed to deserialize mod {packet.ConfigID} config sent from server!");
-					return;
-				}
-			
-				if (incomingConfig == null)
-				{
-					capi.ShowChatMessage($"Failed to synchronise {packet.ConfigID} config sent from server!");
-					return;
-				}
-
-				// Copy new values into existing config instance, so that we don't have to re-register settings; not the most elegant, but it happens only on sync anyway
-				// In the future, we can introduce delta sharing where only the changed variables will be sent, instead of everything
-				// There won't be any more need to send the type either, saving bandwidth and closing a potential security hole
-				foreach (PropertyInfo property in ServerConfig.GetType().GetProperties().Where(p => p.CanWrite))
-				{
-					property.SetValue(ServerConfig, property.GetValue(incomingConfig, null), null);
+					capi.ShowChatMessage($"Failed to synchronise {packet.ConfigID} config sent from server! Mod will likely not work correctly on your computer, please report this issue.");
+					capi.Logger.Error($"Failed to deserialize {packet.ConfigID} config sent from server!\n{exception}");
 				}
 			}
 			#endregion
