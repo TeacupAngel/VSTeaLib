@@ -18,8 +18,7 @@ namespace TeaLib
 				_minValue = minValue;
 				_maxValue = maxValue;
 			}
-			public override string GetStringFromValue(object value) => throw new NotImplementedException();
-			public override string StringSet(CmdArgs args) => throw new NotImplementedException();
+			public override string SetAsString(CmdArgs args) => throw new NotImplementedException();
 		}
 	}
 }

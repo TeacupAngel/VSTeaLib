@@ -34,8 +34,8 @@ namespace TeaLib
 				_maxValue = maxValue;
 			}
 
-			public override string GetStringFromValue(object value) => ((float)value).ToString(CultureInfo.InvariantCulture);
-			public override string StringSet(CmdArgs args)
+			public override string ConvertValueToString(object value) => ((float)value).ToString(CultureInfo.InvariantCulture);
+			public override string SetAsString(CmdArgs args)
 			{
 				if (!(args.Length > 0)) throw new TeaConfigArgumentException("1 decimal number parameter required");
 
@@ -50,7 +50,7 @@ namespace TeaLib
 
 			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged, string settingLangKey)
 			{
-				string inputValue = value != null ? ((float)value).ToString(CultureInfo.InvariantCulture) : StringGet();
+				string inputValue = value != null ? ((float)value).ToString(CultureInfo.InvariantCulture) : GetAsString();
 
 				GuiElementNumberInput input = new(capi, bounds, null, CairoFont.WhiteSmallText());
 				input.SetValue(inputValue, false);

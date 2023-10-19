@@ -28,8 +28,7 @@ namespace TeaLib
 		{
 			public TeaConfigSettingEnum(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 			
-			public override string GetStringFromValue(object value) => value.ToString();
-			public override string StringSet(CmdArgs args)
+			public override string SetAsString(CmdArgs args)
 			{
 				if (!(args.Length > 0)) throw new TeaConfigArgumentException("1 word parameter required");
 
@@ -48,7 +47,7 @@ namespace TeaLib
 			{
 				string[] values = Enum.GetNames<T>();
 				string[] names = Enum.GetNames<T>().Select(value => Lang.Get($"{settingLangKey}-option-{value.ToLowerInvariant()}")).ToArray();
-				string selectedValue = value != null ? (string)value : StringGet();
+				string selectedValue = value != null ? (string)value : GetAsString();
 				int selectedIndex = Array.IndexOf(values, selectedValue);
 
 				GuiElementDropDownFixed input = new(capi, values, names, selectedIndex, (value, selected) => { onChanged(value); }, bounds, CairoFont.WhiteSmallText(), false);

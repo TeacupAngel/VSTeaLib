@@ -32,10 +32,10 @@ namespace TeaLib
 				propertyInfo.SetValue(Config, value);
 			}
 
-			public abstract string GetStringFromValue(object value);
+			public virtual string ConvertValueToString(object value) => value.ToString();
 
-			public virtual string StringGet() => GetStringFromValue(Get()).ToString();
-			public abstract string StringSet(CmdArgs args);
+			public virtual string GetAsString() => ConvertValueToString(Get());
+			public abstract string SetAsString(CmdArgs args);
 
 			public virtual GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged, string settingLangKey) { return null; }
 		}

@@ -19,9 +19,8 @@ namespace TeaLib
 			private readonly TeaConfigSettingGetDeletage _get;
 			private readonly TeaConfigSettingSetDeletage _set;
 
-			public override string GetStringFromValue(object value) => value.ToString();
-			public override string StringGet() => _get();
-			public override string StringSet(CmdArgs args) => _set(args);
+			public override string GetAsString() => _get();
+			public override string SetAsString(CmdArgs args) => _set(args);
 		}
 	}
 }

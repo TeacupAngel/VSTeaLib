@@ -28,10 +28,8 @@ namespace TeaLib
 			{
 				_allowEmpty = allowEmpty;
 			}
-			
-			public override string GetStringFromValue(object value) => value.ToString();
 
-			public override string StringSet(CmdArgs args)
+			public override string SetAsString(CmdArgs args)
 			{
 				if (!(args.Length > 0)) throw new TeaConfigArgumentException("1 string parameter required");
 
@@ -47,7 +45,7 @@ namespace TeaLib
 			public override GuiElement GetInputElement(ICoreClientAPI capi, ElementBounds bounds, object value, string placeholder, TeaConfigSettingOnChanged onChanged, string settingLangKey)
 			{
 				string stringValue = (string)value;
-				string inputValue = _allowEmpty || !String.IsNullOrEmpty(stringValue) ? stringValue : StringGet();
+				string inputValue = _allowEmpty || !String.IsNullOrEmpty(stringValue) ? stringValue : GetAsString();
 
 				GuiElementTextInput input = new(capi, bounds, null, CairoFont.WhiteSmallText());
 				input.SetValue(inputValue, false);
@@ -60,7 +58,7 @@ namespace TeaLib
 
 			private void SendInput(string textInput, TeaConfigSettingOnChanged onChanged)
 			{
-				string result = _allowEmpty || !String.IsNullOrEmpty(textInput) ? textInput : StringGet();
+				string result = _allowEmpty || !String.IsNullOrEmpty(textInput) ? textInput : GetAsString();
 
 				onChanged(result);
 			}

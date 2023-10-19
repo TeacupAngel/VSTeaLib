@@ -24,8 +24,7 @@ namespace TeaLib
 
 			public TeaConfigSettingBool(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 
-			public override string GetStringFromValue(object value) => value.ToString();
-			public override string StringSet(CmdArgs args)
+			public override string SetAsString(CmdArgs args)
 			{
 				if (!(args.Length > 0)) throw new TeaConfigArgumentException("1 boolean parameter required (Choose 'on' or 'off', or 'yes/no', 'true/false', '1/0')");
 

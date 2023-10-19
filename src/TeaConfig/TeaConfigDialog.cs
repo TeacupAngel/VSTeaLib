@@ -323,7 +323,7 @@ namespace TeaLib
 					}
 					else
 					{
-						settingInput = new GuiElementStaticText(capi, setting.StringGet(), EnumTextOrientation.Left, inputBounds, CairoFont.WhiteSmallText());
+						settingInput = new GuiElementStaticText(capi, setting.GetAsString(), EnumTextOrientation.Left, inputBounds, CairoFont.WhiteSmallText());
 					}
 
 					if (settingInput == null) continue;
@@ -401,7 +401,7 @@ namespace TeaLib
 
 					TreeAttribute settingTree = configSettingsTree.GetTreeAttribute(sideName) as TreeAttribute;
 
-					settingTree.SetString(keyValuePair.Key.Setting.Code, keyValuePair.Key.Setting.GetStringFromValue(keyValuePair.Value));
+					settingTree.SetString(keyValuePair.Key.Setting.Code, keyValuePair.Key.Setting.ConvertValueToString(keyValuePair.Value));
 				}
 
 				capi.ModLoader.GetModSystem<TeaConfigDialogSystem>()?.SendSavedSettings(dataTree);

@@ -289,7 +289,7 @@ namespace TeaLib
 
 						try
 						{
-							resultInfo = setting.StringSet(args);
+							resultInfo = setting.SetAsString(args);
 						}
 						catch (Exception exception)
 						{
@@ -369,7 +369,7 @@ namespace TeaLib
 
 					try
 					{
-						result = setting.StringGet();
+						result = setting.GetAsString();
 					}
 					catch (Exception exception)
 					{
