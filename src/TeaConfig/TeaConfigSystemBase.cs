@@ -116,7 +116,7 @@ namespace TeaLib
 				{
 					config.SetVersion(api, Mod.Info.Version, Mod.Info);
 
-					ConfigLoadError($"{ConfigName}: Failed to load {GetConfigTypeString(config.ConfigType)} config! Default values restored", config, api);
+					ConfigLoadError(Lang.Get("tealib:chat-message-config-load-load-fail", ConfigName, GetConfigTypeString(config.ConfigType)), config, api);
 				}
 
 				try
@@ -125,7 +125,7 @@ namespace TeaLib
 				}
 				catch
 				{
-					ConfigLoadError($"{ConfigName}: Failed to migrate {GetConfigTypeString(config.ConfigType)} config to newest version. Could migrate up to {config.Version}", config, api);
+					ConfigLoadError(Lang.Get("tealib:chat-message-config-load-migration-fail", ConfigName, GetConfigTypeString(config.ConfigType), config.Version), config, api);
 				}
 
 				if (saveConfig)
@@ -219,16 +219,16 @@ namespace TeaLib
 
 				string resultMessage = result.type switch
 				{
-					EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{ConfigName}: client settings cannot be set on server",
-					EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT => $"{ConfigName}: setting '{setting.Code}' can't be changed on the client",
-					EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE => $"{ConfigName}: setting '{setting.Code}' can't be changed",
-					EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE => $"{ConfigName}: {result.resultInfo}",
-					EnumTeaConfigSetResultType.ERROR_EXCEPTION => $"{ConfigName}: error setting '{setting.Code}': {result.resultInfo}",
-					EnumTeaConfigSetResultType.ERROR_NO_VALUE => $"{ConfigName}: no value provided to change the setting to",
-					EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING => $"{ConfigName}: unknown setting '{settingCode}'",
-					EnumTeaConfigSetResultType.SUCCESS => result.resultInfo != null ? $"{ConfigName}: set '{setting.Code}' to {result.resultInfo}"
-							: $"{ConfigName}: setting '{setting.Code}' successfully changed",
-					_ => $"{ConfigName}: unknown result"
+					EnumTeaConfigSetResultType.ERROR_CLIENT_SETTING_ON_SERVER => Lang.Get("tealib:modconfig-set-error-client-on-server", ConfigName),
+					EnumTeaConfigSetResultType.ERROR_SERVER_SETTING_ON_CLIENT => Lang.Get("tealib:modconfig-set-error-server-on-client", ConfigName, setting.Code),
+					EnumTeaConfigSetResultType.ERROR_SET_NOT_AVAILABLE => Lang.Get("tealib:modconfig-set-error-not-available", ConfigName, setting.Code),
+					EnumTeaConfigSetResultType.ERROR_EXCEPTION_PARSE => Lang.Get("tealib:modconfig-set-error-exception-parse", ConfigName, result.resultInfo),
+					EnumTeaConfigSetResultType.ERROR_EXCEPTION => Lang.Get("tealib:modconfig-set-error-exception", ConfigName, setting.Code, result.resultInfo),
+					EnumTeaConfigSetResultType.ERROR_NO_VALUE => Lang.Get("tealib:modconfig-set-error-no-value", ConfigName),
+					EnumTeaConfigSetResultType.ERROR_UNKNOWN_SETTING => Lang.Get("tealib:modconfig-set-error-unknown-setting", ConfigName, settingCode),
+					EnumTeaConfigSetResultType.SUCCESS => result.resultInfo != null ? Lang.Get("tealib:modconfig-set-success", ConfigName, setting.Code, result.resultInfo)
+							: Lang.Get("tealib:modconfig-set-success-no-value", ConfigName, setting.Code),
+					_ => Lang.Get("tealib:modconfig-set-unknown-result", ConfigName)
 				};
 
 				if (result.type == EnumTeaConfigSetResultType.SUCCESS)
@@ -318,12 +318,12 @@ namespace TeaLib
 
 				string resultMessage = result.type switch
 				{
-					EnumTeaConfigGetResultType.ERROR_CLIENT_SETTING_ON_SERVER => $"{ConfigName}: client settings cannot be read on server",
-					EnumTeaConfigGetResultType.ERROR_GET_NOT_AVAILABLE => $"{ConfigName}: cannot use get with '{setting.Code}",
-					EnumTeaConfigGetResultType.ERROR_EXCEPTION => $"{ConfigName}: error reading '{setting.Code}': {result.resultInfo}",
-					EnumTeaConfigGetResultType.ERROR_UNKNOWN_SETTING => $"{ConfigName}: unknown setting '{settingCode}'",
-					EnumTeaConfigGetResultType.SUCCESS => $"{ConfigName}: '{setting.Code}' is currently {result.resultInfo}",
-					EnumTeaConfigGetResultType.SUCCESS_NO_VALUE_EXPOSED => $"{ConfigName}: setting '{setting.Code}' shows no value to be displayed",
+					EnumTeaConfigGetResultType.ERROR_CLIENT_SETTING_ON_SERVER => Lang.Get("tealib:modconfig-get-error-client-on-server", ConfigName),
+					EnumTeaConfigGetResultType.ERROR_GET_NOT_AVAILABLE => Lang.Get("tealib:modconfig-get-error-not-available", ConfigName, setting.Code),
+					EnumTeaConfigGetResultType.ERROR_EXCEPTION => Lang.Get("tealib:modconfig-get-error-exception", ConfigName, setting.Code, result.resultInfo),
+					EnumTeaConfigGetResultType.ERROR_UNKNOWN_SETTING => Lang.Get("tealib:modconfig-get-error-unknown-setting", ConfigName, settingCode),
+					EnumTeaConfigGetResultType.SUCCESS => Lang.Get("tealib:modconfig-get-success", ConfigName, setting.Code, result.resultInfo),
+					EnumTeaConfigGetResultType.SUCCESS_NO_VALUE_EXPOSED => Lang.Get("tealib:modconfig-get-success-no-value", ConfigName, setting.Code),
 					_ => $"{ConfigName}: unknown result"
 				};
 
@@ -658,7 +658,7 @@ namespace TeaLib
 				}
 				catch (Exception exception)
 				{
-					capi.ShowChatMessage($"Failed to synchronise {packet.ConfigID} config sent from server! Mod will likely not work correctly on your computer, please report this issue.");
+					capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-sync-error", packet.ConfigID));
 					capi.Logger.Error($"Failed to deserialize {packet.ConfigID} config sent from server!\n{exception}");
 				}
 			}

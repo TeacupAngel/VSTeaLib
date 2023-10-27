@@ -20,6 +20,38 @@
 	"tealib:modconfig-category-graphics": "Graphics",
 	"tealib:modconfig-category-sound": "Sound",
 	"tealib:modconfig-category-other": "Other",
+
+	"tealib:modconfig-get-error-client-on-server": "{0}: client settings cannot be read on server",
+	"tealib:modconfig-get-error-not-available": "{0}: cannot use get with '{1}",
+	"tealib:modconfig-get-error-exception": "{0}: error reading '{1}': {2}",
+	"tealib:modconfig-get-error-unknown-setting": "{0}: unknown setting '{1}'",
+	"tealib:modconfig-get-success": "{0}: '{1}' is currently {2}",
+	"tealib:modconfig-get-success-no-value": "{ConfigName}: setting '{setting.Code}' shows no value to be displayed",
+
+	"tealib:modconfig-set-error-client-on-server": "{0}: client settings cannot be set on server",
+	"tealib:modconfig-set-error-server-on-client": "{0}: setting '{1}' can't be changed on the client",
+	"tealib:modconfig-set-error-not-available": "{0}: setting '{1}' can't be changed",
+	"tealib:modconfig-set-error-exception-parse": "{0}: {1}",
+	"tealib:modconfig-set-error-exception": "{0}: error setting '{1}': {2}",
+	"tealib:modconfig-set-error-no-value": "{0}: no value provided to change the setting to",
+	"tealib:modconfig-set-error-unknown-setting": "{0}: unknown setting '{1}'",
+	"tealib:modconfig-set-success": "{0}: set '{1}' to {2}",
+	"tealib:modconfig-set-success-no-value": "{0}: setting '{1}' successfully changed",
+	"tealib:modconfig-set-unknown-result": "{0}: unknown result",
+
+	"tealib:chat-message-config-load-load-fail": "{0}: Failed to load {1} config! Default values restored",
+	"tealib:chat-message-config-load-migration-fail": "{0}: Failed to migrate {1} config to newest version. Could migrate up to {2}",
+
+	"tealib:chat-message-config-save-no-response": "Received no response for config changes in {0} mods, some settings may not have been saved.",
+	"tealib:chat-message-config-save-success": "All config values successfully changed.",
+	"tealib:chat-message-config-save-error": "Successfully changed {0} settings, encountered {1} errors. See logs for details.",
+	"tealib:chat-message-config-save-success-partial": "Successfully changed {0} settings.",
+	"tealib:chat-message-config-save-error-partial": "Successfully changed {0} settings, encountered {1} errors. See logs for details.",
+	"tealib:chat-message-config-save-reload-world": "Please reload the world to restart mods with new configuration.",
+	"tealib:chat-message-config-save-restart-server": "Please restart the server to reload mods with new configuration.",
+	"tealib:chat-message-config-save-rejoin-server": "Please rejoin the server to reload mods with new configuration.",
+
+	"tealib:chat-message-config-sync-error": "Failed to synchronise {0} config sent from server! Mod will likely not work correctly on your computer, please report this issue.",
 	
 	"tealibdbg:modconfig-category-opinions": "Opinions",
 	"tealibdbg:modconfig-setting-enumsetting": "Enum Setting",

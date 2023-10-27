@@ -117,12 +117,12 @@ namespace TeaLib
 			{
 				if (_pendingConfigs.Count > 0)
 				{
-					_capi.ShowChatMessage($"Received no response for config changes in {_pendingConfigs.Count} mods, some settings may not have been saved.");
+					_capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-no-response", _pendingConfigs.Count));
 
 					string message = "";
 
-					if (_pendingSuccessCount > 0) message += $"Successfully changed {_pendingSuccessCount} settings. ";
-					if (_pendingErrorCount > 0) message += $"Encountered {_pendingErrorCount} errors, see logs for details.";
+					if (_pendingSuccessCount > 0) message += $"{Lang.Get("tealib:chat-message-config-save-success-partial", _pendingSuccessCount)} ";
+					if (_pendingErrorCount > 0) message += Lang.Get("tealib:chat-message-config-save-error-partial", _pendingErrorCount);
 
 					_capi.ShowChatMessage(message);
 				}
@@ -130,11 +130,11 @@ namespace TeaLib
 				{
 					if (_pendingErrorCount == 0 && _pendingSuccessCount > 0)
 					{
-						_capi.ShowChatMessage("All config values successfully changed.");
+						_capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-success"));
 					}
 					else if (_pendingErrorCount > 0)
 					{
-						_capi.ShowChatMessage($"Successfully changed {_pendingSuccessCount} settings, encountered {_pendingErrorCount} errors. See logs for details.");
+						_capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-error", _pendingSuccessCount, _pendingErrorCount));
 					}
 				}
 				
@@ -142,12 +142,12 @@ namespace TeaLib
 				{
 					if (_capi.IsSinglePlayer)
 					{
-						_capi.ShowChatMessage("Please reload the world to restart mods with new configuration.");
+						_capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-reload-world"));
 					}
 					else
 					{
-						if (_pendingFromServer) _capi.ShowChatMessage($"Please restart the server to reload mods with new configuration.");
-						else _capi.ShowChatMessage($"Please rejoin the server to reload mods with new configuration.");
+						if (_pendingFromServer) _capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-restart-server"));
+						else _capi.ShowChatMessage(Lang.Get("tealib:chat-message-config-save-rejoin-server"));
 					}
 				}
 
