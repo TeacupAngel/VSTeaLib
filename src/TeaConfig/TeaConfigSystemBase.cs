@@ -79,18 +79,14 @@ namespace TeaLib
 
 				if (config.ConfigType == EnumTeaConfigApiSide.Client && api.Side == EnumAppSide.Server) return null;
 
-				config.CreateConfigSettings();
-				config.InitialiseSettings();
-
 				if (config.ConfigType == EnumTeaConfigApiSide.Server)
 				{
 					CreateNetworkChannels(api);
 
-					// Server configs are loaded only serverside and then sent to clients; the client loads a default until server values can be sent
+					// Server configs are loaded only serverside and then sent to clients; the client loads a default until server values are received
 					if (api.Side == EnumAppSide.Client) 
 					{
-						config.CreateConfigSettings();
-						config.InitialiseSettings();
+						ConfigSetupSettings(api, config);
 						return config;
 					}
 				}
@@ -125,7 +121,7 @@ namespace TeaLib
 				}
 				catch
 				{
-					ConfigLoadError(Lang.Get("tealib:chat-message-config-load-migration-fail", ConfigName, GetConfigTypeString(config.ConfigType), config.Version), config, api);
+					ConfigLoadError(Lang.Get("tealib:chat-message-config-load-migration-fail", ConfigName, GetConfigTypeString(config.ConfigType), config.ConfigVersion), config, api);
 				}
 
 				if (saveConfig)
@@ -133,10 +129,26 @@ namespace TeaLib
 					config.Save(api, ConfigID);
 				}
 
-				config.CreateConfigSettings();
-				config.InitialiseSettings();
+				ConfigSetupSettings(api, config);
 
 				return config;
+			}
+
+			private void ConfigSetupSettings(ICoreAPI api, TeaConfigBase config)
+			{
+				try
+				{
+					config.CreateConfigSettings((string message, bool isError) => 
+						{
+							api.Logger.Log(isError ? EnumLogType.Error : EnumLogType.Event, $"[TeaLib] {(isError ? "Error" : "Warning")} loading config {ConfigName}: {message}");
+						}
+					);
+					config.InitialiseSettings();
+				}
+				catch (Exception exception)
+				{
+					api.Logger.Error($"Exception loading config {ConfigName}: {exception}");
+				}
 			}
 
 			private void ConfigLoadError(string message, TeaConfigBase config, ICoreAPI api)

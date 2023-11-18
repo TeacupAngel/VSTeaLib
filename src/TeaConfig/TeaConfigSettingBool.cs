@@ -11,16 +11,22 @@ namespace TeaLib
 		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 		public class TeaConfigSettingBoolAttribute : TeaConfigSettingAttribute 
 		{
-			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType, ConfigSettingNotifyDelegate notifyDelegate)
 			{
+				if (propertyType != typeof(bool))
+				{
+					notifyDelegate($"{propertyCode} is type {propertyType.Name}, but its attribute type is Bool. Setting skipped", true);
+					return null;
+				}
+
 				return new TeaConfigSettingBool(propertyCode, Category, Flags);
 			}
 		}
 
 		public class TeaConfigSettingBool : TeaConfigSetting
 		{
-			private static readonly string[] trueAliases = new string[] {"on", "yes", "true", "1"};
-			private static readonly string[] falseAliases = new string[] {"off", "no", "false", "0"};
+			private static readonly string[] trueAliases = ["on", "yes", "true", "1"];
+			private static readonly string[] falseAliases = ["off", "no", "false", "0"];
 
 			public TeaConfigSettingBool(string code, string category, TeaConfigSettingFlags flags = TeaConfigSettingFlags.None) : base(code, category, flags) {}
 

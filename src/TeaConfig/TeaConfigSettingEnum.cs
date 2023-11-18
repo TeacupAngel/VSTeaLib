@@ -15,12 +15,18 @@ namespace TeaLib
 		[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 		public class TeaConfigSettingEnumAttribute : TeaConfigSettingAttribute 
 		{
-			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType, ConfigSettingNotifyDelegate notifyDelegate)
 			{
-				Type genericEnumType = typeof(TeaConfigSettingEnum<>).MakeGenericType(new Type[] {propertyType});
-				TeaConfigSetting enumSetting = Activator.CreateInstance(genericEnumType, propertyCode, Category, Flags) as TeaConfigSetting;
+				if (!propertyType.IsAssignableTo(typeof(Enum)))
+				{
+					notifyDelegate($"{propertyCode} is type {propertyType.Name}, but its attribute type is Enum. Setting skipped", true);
+					return null;
+				}
 
-				return enumSetting;
+				Type genericEnumType = typeof(TeaConfigSettingEnum<>).MakeGenericType(new Type[] {propertyType});
+				TeaConfigSetting setting = Activator.CreateInstance(genericEnumType, propertyCode, Category, Flags) as TeaConfigSetting;
+
+				return setting;
 			}
 		}
 

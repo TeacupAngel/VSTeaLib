@@ -110,15 +110,17 @@ namespace TeaLib
 			[JsonIgnore]
 			public ReadOnlyCollection<TeaConfigSetting> ConfigSettings { get => _configSettings; }
 			
-			public virtual void CreateConfigSettings() 
+			public void CreateConfigSettings(ConfigSettingNotifyDelegate notifyDelegate) 
 			{
 				List<TeaConfigSetting> tempConfigSettingList = new();
 
 				foreach(PropertyInfo propertyInfo in GetType().GetProperties())
 				{
 					TeaConfigSettingAttribute settingAttribute = propertyInfo.GetCustomAttribute<TeaConfigSettingAttribute>();
+					if (settingAttribute == null) continue;
 
-					if (settingAttribute != null) tempConfigSettingList.Add(settingAttribute.GetTeaConfigSetting(propertyInfo.Name, propertyInfo.PropertyType));
+					TeaConfigSetting setting = settingAttribute.GetTeaConfigSetting(propertyInfo.Name, propertyInfo.PropertyType, notifyDelegate);
+					if (setting != null) tempConfigSettingList.Add(setting);
 				}
 
 				_configSettings = tempConfigSettingList.AsReadOnly();

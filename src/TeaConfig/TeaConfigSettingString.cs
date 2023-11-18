@@ -14,8 +14,14 @@ namespace TeaLib
 		{
 			public bool AllowEmpty = false;
 
-			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType)
+			public override TeaConfigSetting GetTeaConfigSetting(string propertyCode, Type propertyType, ConfigSettingNotifyDelegate notifyDelegate)
 			{
+				if (propertyType != typeof(string))
+				{
+					notifyDelegate($"{propertyCode} is type {propertyType.Name}, but its attribute type is String. Setting skipped", true);
+					return null;
+				}
+
 				return new TeaConfigSettingString(propertyCode, Category, AllowEmpty, Flags);
 			}
 		}
