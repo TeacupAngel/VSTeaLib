@@ -54,6 +54,7 @@
 	"tealib:chat-message-config-sync-error": "Failed to synchronise {0} config sent from server! Mod will likely not work correctly on your computer, please report this issue.",
 	
 	"tealibdbg:modconfig-category-opinions": "Opinions",
+	"tealibdbg:modconfig-category-decimals": "Decimals",
 	"tealibdbg:modconfig-setting-enumsetting": "Enum Setting",
 	"tealibdbg:modconfig-setting-enumsetting-option-optiona": "Option A",
 	"tealibdbg:modconfig-setting-enumsetting-option-optionb": "Option B",
@@ -62,5 +63,8 @@
 	"tealibdbg:modconfig-setting-reloadnotrequired": "Reload Not Required",
 	"tealibdbg:modconfig-setting-drifterscariness": "Drifter Scariness",
 	"tealibdbg:modconfig-setting-rngunfainess": "RNG Unfairness",
-	"tealibdbg:modconfig-setting-tastiestfood": "Tastiest Food"
+	"tealibdbg:modconfig-setting-tastiestfood": "Tastiest Food",
+	"tealibdbg:modconfig-setting-float": "Float Setting",
+	"tealibdbg:modconfig-setting-double": "Double Setting",
+	"tealibdbg:modconfig-setting-half": "Half Setting"
 }

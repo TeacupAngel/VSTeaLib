@@ -29,7 +29,7 @@ namespace TeaLib
 			[TeaConfigSettingBool(Category = "general")]
 			public bool BoolSetting {get; set;} = true;
 
-			[TeaConfigSettingFloat(Category = "general", Min = 0, Max = 100, Flags = TeaConfigSettingFlags.RestartNotNeeded)]
+			[TeaConfigSettingDecimal<float>(Category = "general", Min = 0, Max = 100, Flags = TeaConfigSettingFlags.RestartNotNeeded)]
 			public float ReloadNotRequired {get; set;} = 0.5f;
 		}
 	}
