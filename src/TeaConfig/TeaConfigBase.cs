@@ -22,39 +22,39 @@ namespace TeaLib
 			[JsonIgnore]
 			public abstract EnumTeaConfigApiSide ConfigType {get;}
 
-			public string Version;
+			public string ConfigVersion;
 
 			[JsonIgnore]
 			public SemVer SemVerVersion {get; private set;}
 
 			public bool SetVersion(ICoreAPI api, string version, ModInfo modInfo)
 			{
-				if (!SemVer.TryParse(version, out SemVer configVersion, out string configError))
+				if (!SemVer.TryParse(version, out SemVer newSemVerVersion, out string configError))
 				{
-					api.Logger.Error($"{modInfo.Name}: Error trying to parse mod config version. Best guess: {configVersion} (error: {configError})");
+					api.Logger.Error($"{modInfo.Name}: Error trying to parse mod config version. Best guess: {newSemVerVersion} (error: {configError})");
 				}
 
-				bool wasUpdated = configVersion > SemVerVersion;
-				SemVerVersion = configVersion;
-				Version = version;
+				bool wasUpdated = newSemVerVersion > SemVerVersion;
+				SemVerVersion = newSemVerVersion;
+				ConfigVersion = version;
 				return wasUpdated;
 			}
 
 			public void InitialiseVersion(ICoreAPI api, ModInfo modInfo)
 			{
-				SetVersion(api, Version, modInfo);
+				SetVersion(api, ConfigVersion, modInfo);
 			}
 
 			public bool ApplyMigrations(ICoreAPI api, ModInfo modInfo)
 			{
-				if (Version == null)
+				if (ConfigVersion == null)
 				{
 					api.Logger.Error($"Config version was null! Cannot migrate because data was lost, setting version to latest");
 					SetVersion(api, modInfo.Version, modInfo);
 					return true;
 				}
 
-				if (!SemVer.TryParse(Version, out SemVer configVersion, out string configError))
+				if (!SemVer.TryParse(ConfigVersion, out SemVer configVersion, out string configError))
 				{
 					api.Logger.Error($"Error trying to parse config version. Best guess: {configVersion} (error: {configError})");
 				}
@@ -109,7 +109,7 @@ namespace TeaLib
 			protected ReadOnlyCollection<TeaConfigSetting> _configSettings;
 			[JsonIgnore]
 			public ReadOnlyCollection<TeaConfigSetting> ConfigSettings { get => _configSettings; }
-			
+
 			public void CreateConfigSettings(ConfigSettingNotifyDelegate notifyDelegate) 
 			{
 				List<TeaConfigSetting> tempConfigSettingList = new();

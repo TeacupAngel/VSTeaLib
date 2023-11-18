@@ -47,12 +47,13 @@
 	"tealib:chat-message-config-save-error": "Successfully changed {0} settings, encountered {1} errors. See logs for details.",
 	"tealib:chat-message-config-save-success-partial": "Successfully changed {0} settings.",
 	"tealib:chat-message-config-save-error-partial": "Successfully changed {0} settings, encountered {1} errors. See logs for details.",
-	"tealib:chat-message-config-save-reload-world": "Please reload the world to restart mods with new configuration.",
+	"tealib:chat-message-config-save-reload-world": "Please reload the world to start mods with new configuration.",
 	"tealib:chat-message-config-save-restart-server": "Please restart the server to reload mods with new configuration.",
 	"tealib:chat-message-config-save-rejoin-server": "Please rejoin the server to reload mods with new configuration.",
 
 	"tealib:chat-message-config-sync-error": "Failed to synchronise {0} config sent from server! Mod will likely not work correctly on your computer, please report this issue.",
 	
+	// Do not translate, these are only used in debug version of TeaLib
 	"tealibdbg:modconfig-category-opinions": "Opinions",
 	"tealibdbg:modconfig-category-decimals": "Decimals",
 	"tealibdbg:modconfig-setting-enumsetting": "Enum Setting",
@@ -63,6 +64,12 @@
 	"tealibdbg:modconfig-setting-reloadnotrequired": "Reload Not Required",
 	"tealibdbg:modconfig-setting-drifterscariness": "Drifter Scariness",
 	"tealibdbg:modconfig-setting-rngunfainess": "RNG Unfairness",
+	"tealibdbg:modconfig-setting-difficultylevel": "Difficulty Level",
+	"tealibdbg:modconfig-setting-difficultylevel-option-hard": "Hard",
+	"tealibdbg:modconfig-setting-difficultylevel-option-harder": "Harder",
+	"tealibdbg:modconfig-setting-difficultylevel-option-insane": "Insane",
+	"tealibdbg:modconfig-setting-difficultylevel-option-notfun": "Not Fun",
+	"tealibdbg:modconfig-setting-difficultylevel-option-whatthef": "What the F, who made this game, this absolutely sucks and I hate it",
 	"tealibdbg:modconfig-setting-tastiestfood": "Tastiest Food",
 	"tealibdbg:modconfig-setting-float": "Float Setting",
 	"tealibdbg:modconfig-setting-double": "Double Setting",
